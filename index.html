@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechGX Leave Tracker</title>
-    <link rel="icon" type="image/png" href="images/favicon.png">
     <style>
         * {
             margin: 0;
@@ -37,17 +36,6 @@
             gap: 20px;
         }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .company-logo {
-            width: 180px;
-            height: auto;
-        }
-
         .header-title {
             flex: 1;
             text-align: center;
@@ -62,11 +50,6 @@
             margin-bottom: 5px;
         }
 
-        .header-title p {
-            color: #666;
-            font-size: 0.9em;
-        }
-
         .user-info {
             display: flex;
             align-items: center;
@@ -75,10 +58,6 @@
             background: #f0f9ff;
             border-radius: 8px;
             border-left: 4px solid #00a8e8;
-        }
-
-        .user-info strong {
-            color: #00a8e8;
         }
 
         .tabs {
@@ -90,7 +69,7 @@
 
         .tab {
             flex: 1;
-            min-width: 150px;
+            min-width: 120px;
             padding: 15px;
             background: white;
             border: none;
@@ -99,12 +78,10 @@
             font-size: 16px;
             font-weight: 600;
             transition: all 0.3s;
-            color: #333;
         }
 
         .tab:hover {
             background: #f0f9ff;
-            transform: translateY(-2px);
         }
 
         .tab.active {
@@ -140,51 +117,31 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0,168,232,0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .balance-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
         }
 
         .balance-card.sick-leave {
             background: linear-gradient(135deg, #76c043 0%, #5a9e2f 100%);
-            box-shadow: 0 5px 15px rgba(118,192,67,0.3);
         }
 
         .balance-card.holidays {
             background: linear-gradient(135deg, #00a8e8 30%, #76c043 100%);
-            box-shadow: 0 5px 15px rgba(0,168,232,0.3);
         }
 
         .balance-card h3 {
             font-size: 14px;
             opacity: 0.9;
             margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
         }
 
         .balance-card .amount {
             font-size: 36px;
             font-weight: bold;
-            position: relative;
-            z-index: 1;
         }
 
         .balance-card .label {
             font-size: 12px;
             opacity: 0.8;
             margin-top: 5px;
-            position: relative;
-            z-index: 1;
         }
 
         .form-group {
@@ -198,7 +155,7 @@
             color: #333;
         }
 
-        .form-group label .required {
+        .required {
             color: #f56565;
         }
 
@@ -230,7 +187,6 @@
 
         .checkbox-group input[type="checkbox"] {
             width: auto;
-            cursor: pointer;
         }
 
         .btn {
@@ -265,10 +221,6 @@
             font-size: 14px;
         }
 
-        .btn-approve:hover:not(:disabled) {
-            background: #5a9e2f;
-        }
-
         .btn-reject {
             background: #f56565;
             color: white;
@@ -276,19 +228,11 @@
             font-size: 14px;
         }
 
-        .btn-reject:hover:not(:disabled) {
-            background: #dc3545;
-        }
-
         .btn-cancel {
             background: #f6ad55;
             color: white;
             padding: 8px 16px;
             font-size: 14px;
-        }
-
-        .btn-cancel:hover:not(:disabled) {
-            background: #ed8936;
         }
 
         .request-list {
@@ -327,10 +271,6 @@
             margin-bottom: 10px;
             flex-wrap: wrap;
             gap: 10px;
-        }
-
-        .request-header h4 {
-            color: #333;
         }
 
         .status-badge {
@@ -423,12 +363,6 @@
             border-left: 4px solid #76c043;
         }
 
-        .alert-info {
-            background: #dbeafe;
-            color: #1e40af;
-            border-left: 4px solid #00a8e8;
-        }
-
         .login-container {
             max-width: 500px;
             margin: 50px auto;
@@ -443,9 +377,10 @@
             margin-bottom: 30px;
         }
 
-        .login-logo img {
-            width: 200px;
-            margin-bottom: 20px;
+        .login-logo h1 {
+            color: #00a8e8;
+            font-size: 2.5em;
+            margin-bottom: 10px;
         }
 
         .logout-btn {
@@ -466,16 +401,24 @@
             margin-top: 20px;
             color: #00a8e8;
             cursor: pointer;
+            text-decoration: underline;
         }
 
         .switch-link:hover {
-            text-decoration: underline;
+            color: #0086ba;
         }
 
         .employee-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .employee-table thead, .employee-table tbody {
+            display: table;
+            width: 100%;
         }
 
         .employee-table th, .employee-table td {
@@ -487,59 +430,24 @@
         .employee-table th {
             background: #f8f9fa;
             font-weight: 600;
-            color: #333;
         }
 
-        .employee-table tr:hover {
+        .employee-table tbody tr:hover {
             background: #f0f9ff;
         }
 
-        .progress-bar {
-            width: 100px;
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #00a8e8 0%, #76c043 100%);
-            transition: width 0.3s;
-        }
-
         @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .header-left {
-                flex-direction: column;
-            }
-
-            .company-logo {
-                width: 150px;
-            }
-
-            .header-title h1 {
-                font-size: 1.5em;
-            }
-
-            .tabs {
-                flex-direction: column;
-            }
-
-            .tab {
-                width: 100%;
-            }
-
             .form-row {
                 grid-template-columns: 1fr;
             }
-
+            .header-title h1 {
+                font-size: 1.5em;
+            }
             .employee-table {
-                font-size: 14px;
+                font-size: 12px;
+            }
+            .employee-table th, .employee-table td {
+                padding: 8px;
             }
         }
     </style>
@@ -549,9 +457,9 @@
         <!-- Login/Registration Screen -->
         <div id="authScreen" class="login-container">
             <div class="login-logo">
-                <img src="images/logo.png" alt="TechGX Logo">
-                <h2 style="color: #00a8e8; margin-bottom: 10px;">Leave Management System</h2>
-                <p style="color: #666;" id="authSubtitle">Please login with your company credentials</p>
+                <h1>TechGX</h1>
+                <h2 style="color: #76c043; font-size: 1.5em; margin-bottom: 10px;">Leave Management</h2>
+                <p style="color: #666;" id="authSubtitle">Please login with your credentials</p>
             </div>
             
             <!-- Login Form -->
@@ -572,8 +480,8 @@
                     </select>
                 </div>
                 <div id="authAlert"></div>
-                <button class="btn btn-primary" onclick="loginUser()" style="width: 100%;">Login</button>
-                <div class="switch-link" onclick="switchToRegister()">Don't have an account? Register here</div>
+                <button class="btn btn-primary" style="width: 100%;" id="loginBtn">Login</button>
+                <div class="switch-link" id="switchToRegBtn">Don't have an account? Register here</div>
             </div>
 
             <!-- Registration Form -->
@@ -594,7 +502,7 @@
                 </div>
                 <div class="form-group">
                     <label>Password <span class="required">*</span></label>
-                    <input type="password" id="regPassword" placeholder="Create a password" required>
+                    <input type="password" id="regPassword" placeholder="Create a password (min 6 characters)" required>
                 </div>
                 <div class="form-group">
                     <label>Confirm Password <span class="required">*</span></label>
@@ -608,19 +516,16 @@
                     </select>
                 </div>
                 <div id="regAlert"></div>
-                <button class="btn btn-primary" onclick="registerUser()" style="width: 100%;">Register</button>
-                <div class="switch-link" onclick="switchToLogin()">Already have an account? Login here</div>
+                <button class="btn btn-primary" style="width: 100%;" id="registerBtn">Register</button>
+                <div class="switch-link" id="switchToLoginBtn">Already have an account? Login here</div>
             </div>
         </div>
 
         <!-- Main Application -->
         <div id="mainApp" style="display:none;">
             <div class="header">
-                <div class="header-left">
-                    <img src="images/logo.png" alt="TechGX Logo" class="company-logo">
-                </div>
                 <div class="header-title">
-                    <h1>🏖️ Leave Management</h1>
+                    <h1>🏖️ TechGX Leave Management</h1>
                     <p>Track and manage your time off</p>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
@@ -630,17 +535,17 @@
                         <span style="color: #666;">|</span>
                         <span style="color: #666;" id="displayRole"></span>
                     </div>
-                    <button class="btn logout-btn" onclick="logoutUser()">Logout</button>
+                    <button class="btn logout-btn" id="logoutBtn">Logout</button>
                 </div>
             </div>
 
             <div class="tabs">
-                <button class="tab active" onclick="showTab('dashboard')">Dashboard</button>
-                <button class="tab" onclick="showTab('request')">Request Leave</button>
-                <button class="tab" onclick="showTab('history')">My Requests</button>
-                <button class="tab" onclick="showTab('approve')" id="approveTab" style="display:none;">Approve Requests</button>
-                <button class="tab" onclick="showTab('teamView')" id="teamTab" style="display:none;">Team View</button>
-                <button class="tab" onclick="showTab('config')" id="configTab" style="display:none;">Configuration</button>
+                <button class="tab active" data-tab="dashboard">Dashboard</button>
+                <button class="tab" data-tab="request">Request Leave</button>
+                <button class="tab" data-tab="history">My Requests</button>
+                <button class="tab" data-tab="approve" id="approveTab" style="display:none;">Approve Requests</button>
+                <button class="tab" data-tab="teamView" id="teamTab" style="display:none;">Team View</button>
+                <button class="tab" data-tab="config" id="configTab" style="display:none;">Configuration</button>
             </div>
 
             <div class="content">
@@ -649,7 +554,7 @@
                     <div id="alerts"></div>
                     <div class="balance-cards">
                         <div class="balance-card">
-                            <h3>PTO</h3>
+                            <h3>PTO (Paid Time Off)</h3>
                             <div class="amount" id="ptoBalance">--</div>
                             <div class="label">days remaining</div>
                         </div>
@@ -701,10 +606,10 @@
                         </div>
                         <div class="form-group">
                             <label>Notify Colleagues (Optional)</label>
-                            <select id="notifyColleagues" multiple size="5">
+                            <select id="notifyColleagues" multiple size="5" style="height: 120px;">
                                 <option value="">Loading employees...</option>
                             </select>
-                            <small style="color: #666;">Hold Ctrl/Cmd to select multiple</small>
+                            <small style="color: #666;">Hold Ctrl/Cmd to select multiple colleagues</small>
                         </div>
                         <div id="requestAlert"></div>
                         <button type="submit" class="btn btn-primary">Submit Request</button>
@@ -726,22 +631,24 @@
                 <!-- Team View Tab -->
                 <div id="teamView" class="tab-content">
                     <h2 style="color: #00a8e8;">Team Leave Overview</h2>
-                    <table class="employee-table">
-                        <thead>
-                            <tr>
-                                <th>Employee</th>
-                                <th>Role</th>
-                                <th>PTO Used/Total</th>
-                                <th>PTO Remaining</th>
-                                <th>Sick Used/Total</th>
-                                <th>Sick Remaining</th>
-                                <th>Unpaid Used</th>
-                            </tr>
-                        </thead>
-                        <tbody id="teamData">
-                            <tr><td colspan="7">Loading...</td></tr>
-                        </tbody>
-                    </table>
+                    <div style="overflow-x: auto;">
+                        <table class="employee-table">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Role</th>
+                                    <th>PTO Used/Total</th>
+                                    <th>PTO Remaining</th>
+                                    <th>Sick Used/Total</th>
+                                    <th>Sick Remaining</th>
+                                    <th>Unpaid Used</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teamData">
+                                <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Configuration Tab -->
@@ -750,13 +657,13 @@
                         <h2 style="color: #00a8e8;">Leave Allocation</h2>
                         <div class="form-group">
                             <label>Annual PTO Days</label>
-                            <input type="number" id="configPTO" value="20">
+                            <input type="number" id="configPTO" value="20" min="0">
                         </div>
                         <div class="form-group">
                             <label>Annual Sick Leave Days</label>
-                            <input type="number" id="configSickLeave" value="10">
+                            <input type="number" id="configSickLeave" value="10" min="0">
                         </div>
-                        <button class="btn btn-primary" onclick="saveLeaveConfig()">Save Leave Configuration</button>
+                        <button class="btn btn-primary" id="saveConfigBtn">Save Leave Configuration</button>
                     </div>
 
                     <div class="config-section">
@@ -769,7 +676,7 @@
                             <label>Holiday Date</label>
                             <input type="date" id="holidayDate">
                         </div>
-                        <button class="btn btn-primary" onclick="addHoliday()">Add Holiday</button>
+                        <button class="btn btn-primary" id="addHolidayBtn">Add Holiday</button>
                         <div id="holidayList" class="holiday-list"></div>
                     </div>
                 </div>
@@ -778,11 +685,9 @@
     </div>
 
     <script>
-        // ⚠️ IMPORTANT: Replace this with your Google Apps Script Web App URL
+        // ⚠️ IMPORTANT: Replace with your Google Apps Script Web App URL
         const API_URL = 'https://script.google.com/macros/s/AKfycbxY4AJ8SnMc0GQK6cJO9WWvwRJOaLK7f2vOeLEgnG3yvdKK2V7V5fjs4hGlufErPy-1HQ/exec';
-        
-        // Allowed email domains for access control
-        const ALLOWED_DOMAINS = ['techg-x.com', 'techg-x.com'];
+        const ALLOWED_DOMAINS = ['techg-x.com', 'techg-x.in'];
 
         let currentUser = {
             firstName: '',
@@ -798,10 +703,7 @@
         async function apiGet(action, params = {}) {
             const url = new URL(API_URL);
             url.searchParams.append('action', action);
-            Object.keys(params).forEach(key => {
-                url.searchParams.append(key, params[key]);
-            });
-
+            Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
             const response = await fetch(url);
             return await response.json();
         }
@@ -815,37 +717,33 @@
             return await response.json();
         }
 
-        // Validate email domain
         function isAuthorizedEmail(email) {
-            const emailLower = email.toLowerCase();
-            const domain = emailLower.split('@')[1];
-            
+            const domain = email.toLowerCase().split('@')[1];
             if (!ALLOWED_DOMAINS.includes(domain)) {
-                return {authorized: false, message: 'Only TechGX employees can access this system. Please use your company email (@techg-x.com)'};
+                return {authorized: false, message: 'Only TechGX employees (@techg-x.com) can access this system'};
             }
-            
             return {authorized: true};
         }
 
         // Switch between login and registration
-        function switchToRegister() {
+        document.getElementById('switchToRegBtn').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
             document.getElementById('authSubtitle').textContent = 'Create your account';
             document.getElementById('authAlert').innerHTML = '';
             document.getElementById('regAlert').innerHTML = '';
-        }
+        });
 
-        function switchToLogin() {
+        document.getElementById('switchToLoginBtn').addEventListener('click', function() {
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('authSubtitle').textContent = 'Please login with your company credentials';
+            document.getElementById('authSubtitle').textContent = 'Please login with your credentials';
             document.getElementById('authAlert').innerHTML = '';
             document.getElementById('regAlert').innerHTML = '';
-        }
+        });
 
-        // Register new user
-        async function registerUser() {
+        // Register user
+        document.getElementById('registerBtn').addEventListener('click', async function() {
             const firstName = document.getElementById('regFirstName').value.trim();
             const lastName = document.getElementById('regLastName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
@@ -881,20 +779,20 @@
                 if (result.success) {
                     regAlert.innerHTML = '<div class="alert alert-success">✅ Registration successful! Please login.</div>';
                     setTimeout(() => {
-                        switchToLogin();
+                        document.getElementById('switchToLoginBtn').click();
                         document.getElementById('loginEmail').value = email;
                     }, 2000);
                 } else {
                     regAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${result.error}</div>`;
                 }
             } catch (error) {
-                regAlert.innerHTML = '<div class="alert alert-danger">⚠️ Error connecting to server. Please try again.</div>';
+                regAlert.innerHTML = '<div class="alert alert-danger">⚠️ Error connecting to server. Please check your API_URL configuration.</div>';
                 console.error(error);
             }
-        }
+        });
 
         // Login user
-        async function loginUser() {
+        document.getElementById('loginBtn').addEventListener('click', async function() {
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             const role = document.getElementById('loginRole').value;
@@ -903,3 +801,61 @@
             if (!email || !password) {
                 authAlert.innerHTML = '<div class="alert alert-danger">Please enter email and password</div>';
                 return;
+            }
+
+            const authCheck = isAuthorizedEmail(email);
+            if (!authCheck.authorized) {
+                authAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${authCheck.message}</div>`;
+                return;
+            }
+
+            try {
+                const result = await apiPost('loginUser', {email, password, role});
+                
+                if (result.success) {
+                    currentUser = {
+                        firstName: result.firstName,
+                        lastName: result.lastName,
+                        email: result.email,
+                        role: result.role,
+                        balance: {
+                            pto: result.pto,
+                            sickLeave: result.sickLeave,
+                            unpaidLeave: result.unpaidLeave
+                        }
+                    };
+
+                    localStorage.setItem('techgx_user', JSON.stringify(currentUser));
+                    showMainApp();
+                } else {
+                    authAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${result.error}</div>`;
+                }
+            } catch (error) {
+                authAlert.innerHTML = '<div class="alert alert-danger">⚠️ Error connecting to server. Please check your API_URL configuration.</div>';
+                console.error(error);
+            }
+        });
+
+        // Show main application
+        async function showMainApp() {
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('displayName').textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+            document.getElementById('displayRole').textContent = currentUser.role === 'manager' ? 'Manager' : 'Employee';
+            
+            updateRoleTabs();
+            await loadEmployees();
+            await loadDashboard();
+            await loadRequestHistory();
+            
+            if (currentUser.role === 'manager') {
+                await loadPendingRequests();
+                await loadTeamView();
+                await loadConfig();
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.remove
