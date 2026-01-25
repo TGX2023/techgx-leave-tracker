@@ -858,4 +858,399 @@
         // Logout
         document.getElementById('logoutBtn').addEventListener('click', function() {
             if (confirm('Are you sure you want to logout?')) {
-                localStorage.remove
+                localStorage.removeItem('techgx_user');
+                location.reload();
+            }
+        });
+
+        function updateRoleTabs() {
+            const isManager = currentUser.role === 'manager';
+            document.getElementById('approveTab').style.display = isManager ? 'block' : 'none';
+            document.getElementById('teamTab').style.display = isManager ? 'block' : 'none';
+            document.getElementById('configTab').style.display = isManager ? 'block' : 'none';
+        }
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.getElementById(tabName).classList.add('active');
+                this.classList.add('active');
+
+                if (tabName === 'history') loadRequestHistory();
+                if (tabName === 'approve') loadPendingRequests();
+                if (tabName === 'teamView') loadTeamView();
+                if (tabName === 'config') loadHolidays();
+            });
+        });
+
+        // Load employees for dropdown
+        async function loadEmployees() {
+            try {
+                allEmployees = await apiGet('getAllEmployees');
+                const select = document.getElementById('notifyColleagues');
+                select.innerHTML = allEmployees
+                    .filter(e => e.email !== currentUser.email)
+                    .map(e => `<option value="${e.email}">${e.fullName}</option>`)
+                    .join('');
+            } catch (error) {
+                console.error('Error loading employees:', error);
+            }
+        }
+
+        // Dashboard
+        async function loadDashboard() {
+            try {
+                const [balance, holidays] = await Promise.all([
+                    apiGet('getBalance', {email: currentUser.email}),
+                    apiGet('getHolidays')
+                ]);
+
+                if (balance) {
+                    currentUser.balance.pto = balance.pto;
+                    currentUser.balance.sickLeave = balance.sickLeave;
+                    
+                    document.getElementById('ptoBalance').textContent = balance.pto;
+                    document.getElementById('sickLeaveBalance').textContent = balance.sickLeave;
+
+                    const alerts = document.getElementById('alerts');
+                    let alertHTML = '';
+                    if (balance.pto <= 3) {
+                        alertHTML += `<div class="alert alert-warning">⚠️ Low PTO balance: ${balance.pto} days remaining</div>`;
+                    }
+                    if (balance.sickLeave <= 2) {
+                        alertHTML += `<div class="alert alert-warning">⚠️ Low sick leave balance: ${balance.sickLeave} days remaining</div>`;
+                    }
+                    alerts.innerHTML = alertHTML;
+                }
+
+                if (holidays) {
+                    const upcoming = holidays.filter(h => new Date(h.date) > new Date());
+                    document.getElementById('upcomingHolidays').textContent = upcoming.length;
+
+                    const preview = upcoming.slice(0, 3).map(h => 
+                        `<div class="holiday-item"><span><strong>${h.name}</strong></span><span>${new Date(h.date).toLocaleDateString()}</span></div>`
+                    ).join('');
+                    document.getElementById('holidayPreview').innerHTML = preview || '<p>No upcoming holidays</p>';
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Submit leave request
+        document.getElementById('leaveRequestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('leaveType').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const isHalfDay = document.getElementById('isHalfDay').checked;
+            const reason = document.getElementById('reason').value;
+            
+            const notifySelect = document.getElementById('notifyColleagues');
+            const notifyEmails = Array.from(notifySelect.selectedOptions).map(opt => opt.value).join(',');
+
+            let days = calculateDays(startDate, endDate);
+            if (isHalfDay) days = 0.5;
+
+            const requestAlert = document.getElementById('requestAlert');
+
+            if (days <= 0) {
+                requestAlert.innerHTML = '<div class="alert alert-danger">⚠️ Invalid date range</div>';
+                return;
+            }
+
+            try {
+                const result = await apiPost('submitRequest', {
+                    firstName: currentUser.firstName,
+                    lastName: currentUser.lastName,
+                    email: currentUser.email,
+                    type: type,
+                    startDate: startDate,
+                    endDate: endDate,
+                    days: days,
+                    isHalfDay: isHalfDay,
+                    reason: reason,
+                    notifyEmails: notifyEmails
+                });
+
+                if (result.success) {
+                    requestAlert.innerHTML = '<div class="alert alert-success">✅ Leave request submitted successfully! Managers have been notified.</div>';
+                    document.getElementById('leaveRequestForm').reset();
+                    setTimeout(() => {
+                        requestAlert.innerHTML = '';
+                    }, 3000);
+                    await loadRequestHistory();
+                    await loadDashboard();
+                } else {
+                    requestAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${result.error}</div>`;
+                }
+            } catch (error) {
+                requestAlert.innerHTML = `<div class="alert alert-danger">⚠️ Error: ${error.message}</div>`;
+            }
+        });
+
+        function calculateDays(start, end) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+            return Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        }
+
+        // Request history
+        async function loadRequestHistory() {
+            try {
+                const requests = await apiGet('getRequests', {email: currentUser.email});
+                
+                const html = requests.map(r => {
+                    const canCancel = r.status === 'pending' || r.status === 'approved';
+                    const isFuture = new Date(r.startDate) > new Date();
+                    const showCancel = canCancel && isFuture;
+                    
+                    return `
+                    <div class="request-item ${r.status}">
+                        <div class="request-header">
+                            <h4>${r.type.toUpperCase()}${r.isHalfDay ? ' (Half Day)' : ''}</h4>
+                            <span class="status-badge status-${r.status}">${r.status}</span>
+                        </div>
+                        <div class="request-details">
+                            <strong>Duration:</strong> ${new Date(r.startDate).toLocaleDateString()} - ${new Date(r.endDate).toLocaleDateString()} (${r.days} days)<br>
+                            <strong>Reason:</strong> ${r.reason || 'N/A'}<br>
+                            <strong>Submitted:</strong> ${new Date(r.submittedDate).toLocaleDateString()}
+                            ${r.processedDate ? `<br><strong>Processed:</strong> ${new Date(r.processedDate).toLocaleDateString()} by ${r.processedBy}` : ''}
+                        </div>
+                        ${showCancel ? `
+                        <div class="request-actions">
+                            <button class="btn btn-cancel" onclick="cancelRequest(${r.id})">Cancel Request</button>
+                        </div>
+                        ` : ''}
+                    </div>
+                `}).join('');
+                
+                document.getElementById('requestHistory').innerHTML = html || '<p>No requests yet.</p>';
+            } catch (error) {
+                console.error('Error loading request history:', error);
+                document.getElementById('requestHistory').innerHTML = '<p class="alert alert-danger">Error loading requests</p>';
+            }
+        }
+
+        // Cancel request
+        async function cancelRequest(id) {
+            if (!confirm('Are you sure you want to cancel this leave request?')) return;
+
+            try {
+                const result = await apiPost('cancelRequest', {
+                    id: id,
+                    cancelledBy: `${currentUser.firstName} ${currentUser.lastName}`
+                });
+
+                if (result.success) {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'alert alert-success';
+                    msgDiv.textContent = '✅ Leave request cancelled successfully! Managers have been notified.';
+                    document.getElementById('history').insertBefore(msgDiv, document.getElementById('requestHistory'));
+                    setTimeout(() => msgDiv.remove(), 3000);
+                    
+                    await loadRequestHistory();
+                    await loadDashboard();
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert('Error cancelling request: ' + error.message);
+            }
+        }
+
+        // Pending requests (Manager)
+        async function loadPendingRequests() {
+            try {
+                const requests = await apiGet('getPendingRequests');
+                
+                const html = requests.map(r => `
+                    <div class="request-item pending" id="request-${r.id}">
+                        <div class="request-header">
+                            <h4>${r.firstName} ${r.lastName} - ${r.type.toUpperCase()}${r.isHalfDay ? ' (Half Day)' : ''}</h4>
+                            <span class="status-badge status-pending">pending</span>
+                        </div>
+                        <div class="request-details">
+                            <strong>Email:</strong> ${r.email}<br>
+                            <strong>Duration:</strong> ${new Date(r.startDate).toLocaleDateString()} - ${new Date(r.endDate).toLocaleDateString()} (${r.days} days)<br>
+                            <strong>Reason:</strong> ${r.reason || 'N/A'}<br>
+                            <strong>Submitted:</strong> ${new Date(r.submittedDate).toLocaleDateString()}
+                        </div>
+                        <div class="request-actions">
+                            <button class="btn btn-approve" onclick="updateRequestStatus(${r.id}, 'approved')" id="approve-${r.id}">✓ Approve</button>
+                            <button class="btn btn-reject" onclick="updateRequestStatus(${r.id}, 'rejected')" id="reject-${r.id}">✗ Reject</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('pendingRequests').innerHTML = html || '<p>No pending requests.</p>';
+            } catch (error) {
+                console.error('Error loading pending requests:', error);
+            }
+        }
+
+        // Update request status
+        async function updateRequestStatus(id, status) {
+            const approveBtn = document.getElementById(`approve-${id}`);
+            const rejectBtn = document.getElementById(`reject-${id}`);
+            if (approveBtn) approveBtn.disabled = true;
+            if (rejectBtn) rejectBtn.disabled = true;
+
+            try {
+                const result = await apiPost('updateRequestStatus', {
+                    id: id,
+                    status: status,
+                    processedBy: `${currentUser.firstName} ${currentUser.lastName}`
+                });
+
+                if (result.success) {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'alert alert-success';
+                    msgDiv.textContent = `✅ Request ${status} successfully! Employee has been notified.`;
+                    document.getElementById('approve').insertBefore(msgDiv, document.getElementById('pendingRequests'));
+                    setTimeout(() => msgDiv.remove(), 3000);
+                    
+                    await loadPendingRequests();
+                }
+            } catch (error) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'alert alert-danger';
+                msgDiv.textContent = `⚠️ Error: ${error.message}`;
+                document.getElementById('approve').insertBefore(msgDiv, document.getElementById('pendingRequests'));
+                setTimeout(() => msgDiv.remove(), 3000);
+                
+                if (approveBtn) approveBtn.disabled = false;
+                if (rejectBtn) rejectBtn.disabled = false;
+            }
+        }
+
+        // Team view (Manager)
+        async function loadTeamView() {
+            try {
+                const employees = await apiGet('getAllEmployeesData');
+                
+                const html = employees.map(e => `
+                    <tr>
+                        <td><strong>${e.firstName} ${e.lastName}</strong><br><small style="color: #666;">${e.email}</small></td>
+                        <td>${e.role}</td>
+                        <td>${e.ptoUsed}/${e.ptoTotal}</td>
+                        <td><strong>${e.ptoRemaining}</strong></td>
+                        <td>${e.sickUsed}/${e.sickTotal}</td>
+                        <td><strong>${e.sickRemaining}</strong></td>
+                        <td>${e.unpaidUsed}</td>
+                    </tr>
+                `).join('');
+                
+                document.getElementById('teamData').innerHTML = html || '<tr><td colspan="7" style="text-align: center;">No employee data</td></tr>';
+            } catch (error) {
+                console.error('Error loading team view:', error);
+                document.getElementById('teamData').innerHTML = '<tr><td colspan="7" style="text-align: center;" class="alert alert-danger">Error loading data</td></tr>';
+            }
+        }
+
+        // Configuration
+        async function loadConfig() {
+            try {
+                const config = await apiGet('getConfig');
+                document.getElementById('configPTO').value = config.PTOAllocation || 20;
+                document.getElementById('configSickLeave').value = config.SickLeaveAllocation || 10;
+            } catch (error) {
+                console.error('Error loading config:', error);
+            }
+        }
+
+        document.getElementById('saveConfigBtn').addEventListener('click', async function() {
+            try {
+                const result = await apiPost('updateConfig', {
+                    PTOAllocation: document.getElementById('configPTO').value,
+                    SickLeaveAllocation: document.getElementById('configSickLeave').value
+                });
+
+                if (result.success) {
+                    const msgDiv = document.createElement('div');
+                    msgDiv.className = 'alert alert-success';
+                    msgDiv.textContent = '✅ Configuration saved successfully!';
+                    document.querySelector('#config .config-section').insertBefore(msgDiv, document.querySelector('#config .config-section').firstChild);
+                    setTimeout(() => msgDiv.remove(), 3000);
+                }
+            } catch (error) {
+                alert('Error saving configuration: ' + error.message);
+            }
+        });
+
+        // Holidays
+        async function loadHolidays() {
+            try {
+                const holidays = await apiGet('getHolidays');
+                
+                const html = holidays.map(h => `
+                    <div class="holiday-item">
+                        <span><strong>${h.name}</strong> - ${new Date(h.date).toLocaleDateString()}</span>
+                        <button class="btn btn-reject" onclick="removeHoliday('${h.name}', '${h.date}')">Remove</button>
+                    </div>
+                `).join('');
+                
+                document.getElementById('holidayList').innerHTML = html || '<p>No holidays configured.</p>';
+            } catch (error) {
+                console.error('Error loading holidays:', error);
+            }
+        }
+
+        document.getElementById('addHolidayBtn').addEventListener('click', async function() {
+            const name = document.getElementById('holidayName').value.trim();
+            const date = document.getElementById('holidayDate').value;
+
+            if (!name || !date) {
+                alert('Please enter holiday name and date');
+                return;
+            }
+
+            try {
+                const result = await apiPost('addHoliday', {name, date});
+                
+                if (result.success) {
+                    document.getElementById('holidayName').value = '';
+                    document.getElementById('holidayDate').value = '';
+                    await loadHolidays();
+                    await loadDashboard();
+                }
+            } catch (error) {
+                alert('Error adding holiday: ' + error.message);
+            }
+        });
+
+        async function removeHoliday(name, date) {
+            if (!confirm(`Remove holiday: ${name}?`)) return;
+
+            try {
+                const result = await apiPost('removeHoliday', {name, date});
+                
+                if (result.success) {
+                    await loadHolidays();
+                    await loadDashboard();
+                }
+            } catch (error) {
+                alert('Error removing holiday: ' + error.message);
+            }
+        }
+
+        // Check for saved session on page load
+        window.addEventListener('load', () => {
+            const savedUser = localStorage.getItem('techgx_user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    showMainApp();
+                } catch (error) {
+                    console.error('Error loading saved session:', error);
+                    localStorage.removeItem('techgx_user');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
