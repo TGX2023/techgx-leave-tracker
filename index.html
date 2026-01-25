@@ -508,7 +508,7 @@
             </div>
             <div class="form-group">
                 <label>Company Email</label>
-                <input type="email" id="loginEmail" placeholder="your.name@techg-x.in">
+                <input type="email" id="loginEmail" placeholder="your.name@techg-x.com">
             </div>
             <div class="form-group">
                 <label>Role</label>
@@ -659,7 +659,7 @@
         const API_URL = 'https://script.google.com/macros/s/AKfycbxY4AJ8SnMc0GQK6cJO9WWvwRJOaLK7f2vOeLEgnG3yvdKK2V7V5fjs4hGlufErPy-1HQ/exec';
         
         // Allowed email domains for access control
-        const ALLOWED_DOMAINS = ['techg-x.in', 'techgx.in'];
+        const ALLOWED_DOMAINS = ['techg-x.com', 'techg-x.in'];
         
         // Authorized email list (optional - leave empty to allow all emails from allowed domains)
         const AUTHORIZED_EMAILS = [
@@ -696,7 +696,7 @@
             
             // Check if domain is allowed
             if (!ALLOWED_DOMAINS.includes(domain)) {
-                return {authorized: false, message: 'Only TechGX employees can access this system. Please use your company email (@techg-x.in)'};
+                return {authorized: false, message: 'Only TECHG-X employees can access this system. Please use your company email (@techg-x.com)'};
             }
             
             // If specific emails are listed, check against them
