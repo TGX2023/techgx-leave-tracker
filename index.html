@@ -24,55 +24,6 @@
             margin: 0 auto;
         }
 
-        .auth-container {
-            max-width: 500px;
-            margin: 50px auto;
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .auth-logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .auth-logo img {
-            width: 200px;
-            margin-bottom: 20px;
-        }
-
-        .auth-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 12px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .auth-tab.active {
-            background: linear-gradient(135deg, #00a8e8 0%, #76c043 100%);
-            color: white;
-        }
-
-        .auth-content {
-            display: none;
-        }
-
-        .auth-content.active {
-            display: block;
-        }
-
         .header {
             background: white;
             padding: 20px 30px;
@@ -111,6 +62,11 @@
             margin-bottom: 5px;
         }
 
+        .header-title p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -119,6 +75,10 @@
             background: #f0f9ff;
             border-radius: 8px;
             border-left: 4px solid #00a8e8;
+        }
+
+        .user-info strong {
+            color: #00a8e8;
         }
 
         .tabs {
@@ -139,6 +99,7 @@
             font-size: 16px;
             font-weight: 600;
             transition: all 0.3s;
+            color: #333;
         }
 
         .tab:hover {
@@ -195,14 +156,12 @@
 
         .balance-card.sick-leave {
             background: linear-gradient(135deg, #76c043 0%, #5a9e2f 100%);
-        }
-
-        .balance-card.unpaid-leave {
-            background: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+            box-shadow: 0 5px 15px rgba(118,192,67,0.3);
         }
 
         .balance-card.holidays {
             background: linear-gradient(135deg, #00a8e8 30%, #76c043 100%);
+            box-shadow: 0 5px 15px rgba(0,168,232,0.3);
         }
 
         .balance-card h3 {
@@ -239,6 +198,10 @@
             color: #333;
         }
 
+        .form-group label .required {
+            color: #f56565;
+        }
+
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 12px;
@@ -256,19 +219,18 @@
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 20px;
         }
 
         .checkbox-group {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 20px;
         }
 
         .checkbox-group input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: auto;
+            cursor: pointer;
         }
 
         .btn {
@@ -303,19 +265,34 @@
             font-size: 14px;
         }
 
-        .btn-reject, .btn-cancel {
+        .btn-approve:hover:not(:disabled) {
+            background: #5a9e2f;
+        }
+
+        .btn-reject {
             background: #f56565;
             color: white;
             padding: 8px 16px;
             font-size: 14px;
         }
 
-        .logout-btn {
-            background: transparent;
-            color: #f56565;
-            border: 2px solid #f56565;
+        .btn-reject:hover:not(:disabled) {
+            background: #dc3545;
+        }
+
+        .btn-cancel {
+            background: #f6ad55;
+            color: white;
             padding: 8px 16px;
             font-size: 14px;
+        }
+
+        .btn-cancel:hover:not(:disabled) {
+            background: #ed8936;
+        }
+
+        .request-list {
+            margin-top: 30px;
         }
 
         .request-item {
@@ -334,8 +311,13 @@
             border-left-color: #76c043;
         }
 
-        .request-item.rejected, .request-item.cancelled {
+        .request-item.rejected {
             border-left-color: #f56565;
+        }
+
+        .request-item.cancelled {
+            border-left-color: #a0aec0;
+            opacity: 0.7;
         }
 
         .request-header {
@@ -345,6 +327,10 @@
             margin-bottom: 10px;
             flex-wrap: wrap;
             gap: 10px;
+        }
+
+        .request-header h4 {
+            color: #333;
         }
 
         .status-badge {
@@ -365,9 +351,20 @@
             color: #065f46;
         }
 
-        .status-rejected, .status-cancelled {
+        .status-rejected {
             background: #fee2e2;
             color: #991b1b;
+        }
+
+        .status-cancelled {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .request-details {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
 
         .request-actions {
@@ -377,10 +374,41 @@
             flex-wrap: wrap;
         }
 
+        .holiday-list {
+            margin-top: 20px;
+        }
+
+        .holiday-item {
+            background: #f0f9ff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #00a8e8;
+        }
+
+        .config-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .config-section:last-child {
+            border-bottom: none;
+        }
+
         .alert {
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
         }
 
         .alert-danger {
@@ -395,21 +423,53 @@
             border-left: 4px solid #76c043;
         }
 
-        .alert-warning {
-            background: #fef3c7;
-            color: #92400e;
-            border-left: 4px solid #f59e0b;
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #00a8e8;
         }
 
-        .holiday-item {
-            background: #f0f9ff;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #00a8e8;
+        .login-container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo img {
+            width: 200px;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: #f56565;
+            border: 2px solid #f56565;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: #f56565;
+            color: white;
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #00a8e8;
+            cursor: pointer;
+        }
+
+        .switch-link:hover {
+            text-decoration: underline;
         }
 
         .employee-table {
@@ -425,110 +485,131 @@
         }
 
         .employee-table th {
-            background: #f0f9ff;
+            background: #f8f9fa;
             font-weight: 600;
-            color: #00a8e8;
+            color: #333;
         }
 
         .employee-table tr:hover {
-            background: #f8f9fa;
+            background: #f0f9ff;
         }
 
-        .multiselect {
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 10px;
-            max-height: 150px;
-            overflow-y: auto;
+        .progress-bar {
+            width: 100px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
         }
 
-        .multiselect label {
-            display: block;
-            padding: 5px;
-            cursor: pointer;
-        }
-
-        .multiselect input[type="checkbox"] {
-            margin-right: 8px;
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #00a8e8 0%, #76c043 100%);
+            transition: width 0.3s;
         }
 
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
+                text-align: center;
             }
-            
+
+            .header-left {
+                flex-direction: column;
+            }
+
+            .company-logo {
+                width: 150px;
+            }
+
+            .header-title h1 {
+                font-size: 1.5em;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                width: 100%;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
-            .company-logo {
-                width: 150px;
+
+            .employee-table {
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Authentication Screen -->
-        <div id="authScreen" class="auth-container">
-            <div class="auth-logo">
+        <!-- Login/Registration Screen -->
+        <div id="authScreen" class="login-container">
+            <div class="login-logo">
                 <img src="images/logo.png" alt="TechGX Logo">
                 <h2 style="color: #00a8e8; margin-bottom: 10px;">Leave Management System</h2>
-                <p style="color: #666;">Manage your time off efficiently</p>
+                <p style="color: #666;" id="authSubtitle">Please login with your company credentials</p>
             </div>
-
-            <div class="auth-tabs">
-                <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
-                <button class="auth-tab" onclick="showAuthTab('register')">Register</button>
-            </div>
-
+            
             <!-- Login Form -->
-            <div id="loginForm" class="auth-content active">
+            <div id="loginForm">
                 <div class="form-group">
-                    <label>Email *</label>
+                    <label>Company Email <span class="required">*</span></label>
                     <input type="email" id="loginEmail" placeholder="your.name@techg-x.com" required>
                 </div>
                 <div class="form-group">
-                    <label>Password *</label>
+                    <label>Password <span class="required">*</span></label>
                     <input type="password" id="loginPassword" placeholder="Enter your password" required>
                 </div>
                 <div class="form-group">
-                    <label>Role</label>
+                    <label>Role <span class="required">*</span></label>
                     <select id="loginRole">
                         <option value="employee">Employee</option>
                         <option value="manager">Manager/Admin</option>
                     </select>
                 </div>
-                <div id="loginAlert"></div>
+                <div id="authAlert"></div>
                 <button class="btn btn-primary" onclick="loginUser()" style="width: 100%;">Login</button>
+                <div class="switch-link" onclick="switchToRegister()">Don't have an account? Register here</div>
             </div>
 
-            <!-- Register Form -->
-            <div id="registerForm" class="auth-content">
+            <!-- Registration Form -->
+            <div id="registerForm" style="display:none;">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>First Name *</label>
-                        <input type="text" id="regFirstName" placeholder="John" required>
+                        <label>First Name <span class="required">*</span></label>
+                        <input type="text" id="regFirstName" placeholder="First Name" required>
                     </div>
                     <div class="form-group">
-                        <label>Last Name *</label>
-                        <input type="text" id="regLastName" placeholder="Doe" required>
+                        <label>Last Name <span class="required">*</span></label>
+                        <input type="text" id="regLastName" placeholder="Last Name" required>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Company Email *</label>
+                    <label>Company Email <span class="required">*</span></label>
                     <input type="email" id="regEmail" placeholder="your.name@techg-x.com" required>
                 </div>
                 <div class="form-group">
-                    <label>Password *</label>
+                    <label>Password <span class="required">*</span></label>
                     <input type="password" id="regPassword" placeholder="Create a password" required>
                 </div>
                 <div class="form-group">
-                    <label>Confirm Password *</label>
+                    <label>Confirm Password <span class="required">*</span></label>
                     <input type="password" id="regConfirmPassword" placeholder="Confirm your password" required>
                 </div>
-                <div id="registerAlert"></div>
+                <div class="form-group">
+                    <label>Role <span class="required">*</span></label>
+                    <select id="regRole">
+                        <option value="employee">Employee</option>
+                        <option value="manager">Manager/Admin</option>
+                    </select>
+                </div>
+                <div id="regAlert"></div>
                 <button class="btn btn-primary" onclick="registerUser()" style="width: 100%;">Register</button>
+                <div class="switch-link" onclick="switchToLogin()">Already have an account? Login here</div>
             </div>
         </div>
 
@@ -558,7 +639,7 @@
                 <button class="tab" onclick="showTab('request')">Request Leave</button>
                 <button class="tab" onclick="showTab('history')">My Requests</button>
                 <button class="tab" onclick="showTab('approve')" id="approveTab" style="display:none;">Approve Requests</button>
-                <button class="tab" onclick="showTab('teamview')" id="teamviewTab" style="display:none;">Team View</button>
+                <button class="tab" onclick="showTab('teamView')" id="teamTab" style="display:none;">Team View</button>
                 <button class="tab" onclick="showTab('config')" id="configTab" style="display:none;">Configuration</button>
             </div>
 
@@ -577,11 +658,6 @@
                             <div class="amount" id="sickLeaveBalance">--</div>
                             <div class="label">days remaining</div>
                         </div>
-                        <div class="balance-card unpaid-leave">
-                            <h3>Unpaid Leave</h3>
-                            <div class="amount" id="unpaidLeaveBalance">∞</div>
-                            <div class="label">no limit</div>
-                        </div>
                         <div class="balance-card holidays">
                             <h3>Upcoming Holidays</h3>
                             <div class="amount" id="upcomingHolidays">--</div>
@@ -597,7 +673,7 @@
                     <h2 style="color: #00a8e8;">Request Leave</h2>
                     <form id="leaveRequestForm">
                         <div class="form-group">
-                            <label>Leave Type *</label>
+                            <label>Leave Type <span class="required">*</span></label>
                             <select id="leaveType" required>
                                 <option value="">Select leave type</option>
                                 <option value="pto">PTO (Paid Time Off)</option>
@@ -607,25 +683,28 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Start Date *</label>
+                                <label>Start Date <span class="required">*</span></label>
                                 <input type="date" id="startDate" required>
                             </div>
                             <div class="form-group">
-                                <label>End Date *</label>
+                                <label>End Date <span class="required">*</span></label>
                                 <input type="date" id="endDate" required>
                             </div>
                         </div>
-                        <div class="checkbox-group">
+                        <div class="form-group checkbox-group">
                             <input type="checkbox" id="isHalfDay">
-                            <label for="isHalfDay">This is a half-day leave</label>
+                            <label for="isHalfDay" style="margin-bottom: 0;">Half Day Leave</label>
                         </div>
                         <div class="form-group">
                             <label>Reason</label>
-                            <textarea id="reason" rows="3" placeholder="Please provide a reason for your leave request"></textarea>
+                            <textarea id="reason" rows="4" placeholder="Please provide a reason for your leave request"></textarea>
                         </div>
                         <div class="form-group">
                             <label>Notify Colleagues (Optional)</label>
-                            <div id="colleagueSelect" class="multiselect"></div>
+                            <select id="notifyColleagues" multiple size="5">
+                                <option value="">Loading employees...</option>
+                            </select>
+                            <small style="color: #666;">Hold Ctrl/Cmd to select multiple</small>
                         </div>
                         <div id="requestAlert"></div>
                         <button type="submit" class="btn btn-primary">Submit Request</button>
@@ -635,24 +714,39 @@
                 <!-- History Tab -->
                 <div id="history" class="tab-content">
                     <h2 style="color: #00a8e8;">My Leave Requests</h2>
-                    <div id="requestHistory"></div>
+                    <div id="requestHistory" class="request-list"></div>
                 </div>
 
                 <!-- Approve Tab -->
                 <div id="approve" class="tab-content">
                     <h2 style="color: #00a8e8;">Pending Leave Requests</h2>
-                    <div id="pendingRequests"></div>
+                    <div id="pendingRequests" class="request-list"></div>
                 </div>
 
                 <!-- Team View Tab -->
-                <div id="teamview" class="tab-content">
+                <div id="teamView" class="tab-content">
                     <h2 style="color: #00a8e8;">Team Leave Overview</h2>
-                    <div id="teamData"></div>
+                    <table class="employee-table">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Role</th>
+                                <th>PTO Used/Total</th>
+                                <th>PTO Remaining</th>
+                                <th>Sick Used/Total</th>
+                                <th>Sick Remaining</th>
+                                <th>Unpaid Used</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamData">
+                            <tr><td colspan="7">Loading...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Configuration Tab -->
                 <div id="config" class="tab-content">
-                    <div style="margin-bottom: 30px; padding-bottom: 30px; border-bottom: 2px solid #e0e0e0;">
+                    <div class="config-section">
                         <h2 style="color: #00a8e8;">Leave Allocation</h2>
                         <div class="form-group">
                             <label>Annual PTO Days</label>
@@ -660,25 +754,23 @@
                         </div>
                         <div class="form-group">
                             <label>Annual Sick Leave Days</label>
-                            <input type="number" id="configSick" value="10">
+                            <input type="number" id="configSickLeave" value="10">
                         </div>
-                        <button class="btn btn-primary" onclick="saveLeaveConfig()">Save Configuration</button>
+                        <button class="btn btn-primary" onclick="saveLeaveConfig()">Save Leave Configuration</button>
                     </div>
 
-                    <div>
+                    <div class="config-section">
                         <h2 style="color: #00a8e8;">Company Holidays</h2>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Holiday Name</label>
-                                <input type="text" id="holidayName" placeholder="e.g., New Year's Day">
-                            </div>
-                            <div class="form-group">
-                                <label>Holiday Date</label>
-                                <input type="date" id="holidayDate">
-                            </div>
+                        <div class="form-group">
+                            <label>Holiday Name</label>
+                            <input type="text" id="holidayName" placeholder="e.g., New Year's Day">
+                        </div>
+                        <div class="form-group">
+                            <label>Holiday Date</label>
+                            <input type="date" id="holidayDate">
                         </div>
                         <button class="btn btn-primary" onclick="addHoliday()">Add Holiday</button>
-                        <div id="holidayList"></div>
+                        <div id="holidayList" class="holiday-list"></div>
                     </div>
                 </div>
             </div>
@@ -686,35 +778,41 @@
     </div>
 
     <script>
-        // ⚠️ IMPORTANT: Replace with your Google Apps Script Web App URL
+        // ⚠️ IMPORTANT: Replace this with your Google Apps Script Web App URL
         const API_URL = 'https://script.google.com/macros/s/AKfycbxY4AJ8SnMc0GQK6cJO9WWvwRJOaLK7f2vOeLEgnG3yvdKK2V7V5fjs4hGlufErPy-1HQ/exec';
         
-        const ALLOWED_DOMAINS = ['techg-x.com', 'techgx.in'];
+        // Allowed email domains for access control
+        const ALLOWED_DOMAINS = ['techg-x.com', 'techg-x.in'];
 
-        let currentUser = null;
-        let allUsers = [];
+        let currentUser = {
+            firstName: '',
+            lastName: '',
+            email: '',
+            role: 'employee',
+            balance: {pto: 0, sickLeave: 0, unpaidLeave: 0}
+        };
 
-        // Check auth state on load
-        window.addEventListener('load', async () => {
-            const savedUser = localStorage.getItem('techgx_user');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                await showMainApp();
-            }
-        });
+        let allEmployees = [];
 
-        // Auth tab switching
-        function showAuthTab(tab) {
-            document.querySelectorAll('.auth-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            
-            if (tab === 'login') {
-                document.getElementById('loginForm').classList.add('active');
-                event.target.classList.add('active');
-            } else {
-                document.getElementById('registerForm').classList.add('active');
-                event.target.classList.add('active');
-            }
+        // API Helper Functions
+        async function apiGet(action, params = {}) {
+            const url = new URL(API_URL);
+            url.searchParams.append('action', action);
+            Object.keys(params).forEach(key => {
+                url.searchParams.append(key, params[key]);
+            });
+
+            const response = await fetch(url);
+            return await response.json();
+        }
+
+        async function apiPost(action, data) {
+            const url = `${API_URL}?action=${action}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            return await response.json();
         }
 
         // Validate email domain
@@ -729,50 +827,69 @@
             return {authorized: true};
         }
 
-        // Register user
+        // Switch between login and registration
+        function switchToRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('authSubtitle').textContent = 'Create your account';
+            document.getElementById('authAlert').innerHTML = '';
+            document.getElementById('regAlert').innerHTML = '';
+        }
+
+        function switchToLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('authSubtitle').textContent = 'Please login with your company credentials';
+            document.getElementById('authAlert').innerHTML = '';
+            document.getElementById('regAlert').innerHTML = '';
+        }
+
+        // Register new user
         async function registerUser() {
             const firstName = document.getElementById('regFirstName').value.trim();
             const lastName = document.getElementById('regLastName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
-            const registerAlert = document.getElementById('registerAlert');
+            const role = document.getElementById('regRole').value;
+            const regAlert = document.getElementById('regAlert');
 
             if (!firstName || !lastName || !email || !password) {
-                registerAlert.innerHTML = '<div class="alert alert-danger">All fields are required</div>';
+                regAlert.innerHTML = '<div class="alert alert-danger">All fields are required</div>';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                regAlert.innerHTML = '<div class="alert alert-danger">Passwords do not match</div>';
+                return;
+            }
+
+            if (password.length < 6) {
+                regAlert.innerHTML = '<div class="alert alert-danger">Password must be at least 6 characters</div>';
                 return;
             }
 
             const authCheck = isAuthorizedEmail(email);
             if (!authCheck.authorized) {
-                registerAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${authCheck.message}</div>`;
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                registerAlert.innerHTML = '<div class="alert alert-danger">Passwords do not match</div>';
-                return;
-            }
-
-            if (password.length < 6) {
-                registerAlert.innerHTML = '<div class="alert alert-danger">Password must be at least 6 characters</div>';
+                regAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${authCheck.message}</div>`;
                 return;
             }
 
             try {
-                const result = await apiPost('registerUser', {firstName, lastName, email, password});
+                const result = await apiPost('registerUser', {firstName, lastName, email, password, role});
                 
                 if (result.success) {
-                    registerAlert.innerHTML = '<div class="alert alert-success">✅ Registration successful! Please login.</div>';
+                    regAlert.innerHTML = '<div class="alert alert-success">✅ Registration successful! Please login.</div>';
                     setTimeout(() => {
-                        showAuthTab('login');
+                        switchToLogin();
                         document.getElementById('loginEmail').value = email;
                     }, 2000);
                 } else {
-                    registerAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${result.error}</div>`;
+                    regAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${result.error}</div>`;
                 }
             } catch (error) {
-                registerAlert.innerHTML = '<div class="alert alert-danger">⚠️ Error: ' + error.message + '</div>';
+                regAlert.innerHTML = '<div class="alert alert-danger">⚠️ Error connecting to server. Please try again.</div>';
+                console.error(error);
             }
         }
 
@@ -781,98 +898,8 @@
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             const role = document.getElementById('loginRole').value;
-            const loginAlert = document.getElementById('loginAlert');
+            const authAlert = document.getElementById('authAlert');
 
             if (!email || !password) {
-                loginAlert.innerHTML = '<div class="alert alert-danger">Email and password are required</div>';
+                authAlert.innerHTML = '<div class="alert alert-danger">Please enter email and password</div>';
                 return;
-            }
-
-            const authCheck = isAuthorizedEmail(email);
-            if (!authCheck.authorized) {
-                loginAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${authCheck.message}</div>`;
-                return;
-            }
-
-            try {
-                const result = await apiPost('loginUser', {email, password, role});
-                
-                if (result.success) {
-                    currentUser = result.user;
-                    localStorage.setItem('techgx_user', JSON.stringify(currentUser));
-                    await showMainApp();
-                } else {
-                    loginAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${result.error}</div>`;
-                }
-            } catch (error) {
-                loginAlert.innerHTML = '<div class="alert alert-danger">⚠️ Error connecting to server</div>';
-            }
-        }
-
-        // Show main app
-        async function showMainApp() {
-            document.getElementById('authScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            document.getElementById('displayName').textContent = `${currentUser.firstName} ${currentUser.lastName}`;
-            document.getElementById('displayRole').textContent = currentUser.role === 'manager' ? 'Manager' : 'Employee';
-            
-            updateRoleTabs();
-            await loadAllUsers();
-            await loadDashboard();
-            await loadRequestHistory();
-            
-            if (currentUser.role === 'manager') {
-                await loadPendingRequests();
-                await loadTeamData();
-                await loadConfig();
-            }
-        }
-
-        // Logout
-        function logoutUser() {
-            if (confirm('Are you sure you want to logout?')) {
-                localStorage.removeItem('techgx_user');
-                location.reload();
-            }
-        }
-
-        // API helpers
-        async function apiGet(action, params = {}) {
-            const url = new URL(API_URL);
-            url.searchParams.append('action', action);
-            Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-            const response = await fetch(url);
-            return await response.json();
-        }
-
-        async function apiPost(action, data) {
-            const url = `${API_URL}?action=${action}`;
-            const response = await fetch(url, {
-                method: 'POST',
-                body: JSON.stringify(data)
-            });
-            return await response.json();
-        }
-
-        function updateRoleTabs() {
-            const isManager = currentUser.role === 'manager';
-            document.getElementById('approveTab').style.display = isManager ? 'block' : 'none';
-            document.getElementById('teamviewTab').style.display = isManager ? 'block' : 'none';
-            document.getElementById('configTab').style.display = isManager ? 'block' : 'none';
-        }
-
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-
-            if (tabName === 'history') loadRequestHistory();
-            if (tabName === 'approve') loadPendingRequests();
-            if (tabName === 'teamview') loadTeamData();
-            if (tabName === 'config') loadHolidays();
-        }
-
-        // Load all users for colleague selection
-        async function loadAllUsers() {
-            try
