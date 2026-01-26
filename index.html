@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechGX Leave Tracker</title>
+    <title>TechGX Leave Management System v5</title>
+    <link rel="icon" href="images/favicon.png">
     <style>
         * {
             margin: 0;
@@ -36,6 +37,17 @@
             gap: 20px;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .company-logo {
+            width: 180px;
+            height: auto;
+        }
+
         .header-title {
             flex: 1;
             text-align: center;
@@ -50,6 +62,11 @@
             margin-bottom: 5px;
         }
 
+        .header-title p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -58,6 +75,10 @@
             background: #f0f9ff;
             border-radius: 8px;
             border-left: 4px solid #00a8e8;
+        }
+
+        .user-info strong {
+            color: #00a8e8;
         }
 
         .tabs {
@@ -69,7 +90,7 @@
 
         .tab {
             flex: 1;
-            min-width: 120px;
+            min-width: 150px;
             padding: 15px;
             background: white;
             border: none;
@@ -78,10 +99,12 @@
             font-size: 16px;
             font-weight: 600;
             transition: all 0.3s;
+            color: #333;
         }
 
         .tab:hover {
             background: #f0f9ff;
+            transform: translateY(-2px);
         }
 
         .tab.active {
@@ -117,31 +140,64 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0,168,232,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
         }
 
         .balance-card.sick-leave {
             background: linear-gradient(135deg, #76c043 0%, #5a9e2f 100%);
+            box-shadow: 0 5px 15px rgba(118,192,67,0.3);
+        }
+
+        .balance-card.unpaid {
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+            box-shadow: 0 5px 15px rgba(160,174,192,0.3);
         }
 
         .balance-card.holidays {
             background: linear-gradient(135deg, #00a8e8 30%, #76c043 100%);
+            box-shadow: 0 5px 15px rgba(0,168,232,0.3);
         }
 
         .balance-card h3 {
             font-size: 14px;
             opacity: 0.9;
             margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .balance-card .amount {
             font-size: 36px;
             font-weight: bold;
+            position: relative;
+            z-index: 1;
         }
 
         .balance-card .label {
             font-size: 12px;
             opacity: 0.8;
             margin-top: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .balance-detail {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
         }
 
         .form-group {
@@ -155,7 +211,7 @@
             color: #333;
         }
 
-        .required {
+        .form-group label .required {
             color: #f56565;
         }
 
@@ -173,6 +229,11 @@
             border-color: #00a8e8;
         }
 
+        .form-group input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -183,10 +244,12 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 20px;
         }
 
         .checkbox-group input[type="checkbox"] {
             width: auto;
+            cursor: pointer;
         }
 
         .btn {
@@ -221,6 +284,10 @@
             font-size: 14px;
         }
 
+        .btn-approve:hover:not(:disabled) {
+            background: #5a9e2f;
+        }
+
         .btn-reject {
             background: #f56565;
             color: white;
@@ -228,11 +295,19 @@
             font-size: 14px;
         }
 
+        .btn-reject:hover:not(:disabled) {
+            background: #dc3545;
+        }
+
         .btn-cancel {
             background: #f6ad55;
             color: white;
             padding: 8px 16px;
             font-size: 14px;
+        }
+
+        .btn-cancel:hover:not(:disabled) {
+            background: #ed8936;
         }
 
         .request-list {
@@ -273,6 +348,10 @@
             gap: 10px;
         }
 
+        .request-header h4 {
+            color: #333;
+        }
+
         .status-badge {
             padding: 6px 12px;
             border-radius: 20px;
@@ -299,6 +378,11 @@
         .status-cancelled {
             background: #e2e8f0;
             color: #4a5568;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #92400e;
         }
 
         .request-details {
@@ -363,6 +447,12 @@
             border-left: 4px solid #76c043;
         }
 
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #00a8e8;
+        }
+
         .login-container {
             max-width: 500px;
             margin: 50px auto;
@@ -375,6 +465,11 @@
         .login-logo {
             text-align: center;
             margin-bottom: 30px;
+        }
+
+        .login-logo img {
+            width: 200px;
+            margin-bottom: 20px;
         }
 
         .login-logo h1 {
@@ -408,17 +503,53 @@
             color: #0086ba;
         }
 
+        .colleague-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .colleague-selector select {
+            flex: 1;
+        }
+
+        .selected-colleagues {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .colleague-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0f9ff;
+            border: 1px solid #00a8e8;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .colleague-tag button {
+            background: none;
+            border: none;
+            color: #f56565;
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            padding: 0;
+            font-weight: bold;
+        }
+
+        .colleague-tag button:hover {
+            color: #dc3545;
+        }
+
         .employee-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            overflow-x: auto;
-            display: block;
-        }
-
-        .employee-table thead, .employee-table tbody {
-            display: table;
-            width: 100%;
         }
 
         .employee-table th, .employee-table td {
@@ -430,24 +561,45 @@
         .employee-table th {
             background: #f8f9fa;
             font-weight: 600;
+            color: #333;
         }
 
-        .employee-table tbody tr:hover {
+        .employee-table tr:hover {
             background: #f0f9ff;
         }
 
         @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
+            .header {
+                flex-direction: column;
+                text-align: center;
             }
+
+            .header-left {
+                flex-direction: column;
+            }
+
+            .company-logo {
+                width: 150px;
+            }
+
             .header-title h1 {
                 font-size: 1.5em;
             }
-            .employee-table {
-                font-size: 12px;
+
+            .tabs {
+                flex-direction: column;
             }
-            .employee-table th, .employee-table td {
-                padding: 8px;
+
+            .tab {
+                width: 100%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .employee-table {
+                font-size: 14px;
             }
         }
     </style>
@@ -457,7 +609,8 @@
         <!-- Login/Registration Screen -->
         <div id="authScreen" class="login-container">
             <div class="login-logo">
-                <h1>TechGX</h1>
+                <img src="images/logo.png" alt="TECHG-X Logo" onerror="this.style.display='none'">
+                <h1>TECHG-X</h1>
                 <h2 style="color: #76c043; font-size: 1.5em; margin-bottom: 10px;">Leave Management</h2>
                 <p style="color: #666;" id="authSubtitle">Please login with your credentials</p>
             </div>
@@ -524,8 +677,11 @@
         <!-- Main Application -->
         <div id="mainApp" style="display:none;">
             <div class="header">
+                <div class="header-left">
+                    <img src="images/logo.png" alt="TECHG-X Logo" class="company-logo" onerror="this.style.display='none'">
+                </div>
                 <div class="header-title">
-                    <h1>🏖️ TechGX Leave Management</h1>
+                    <h1>🏖️ Leave Management</h1>
                     <p>Track and manage your time off</p>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
@@ -551,17 +707,25 @@
             <div class="content">
                 <!-- Dashboard Tab -->
                 <div id="dashboard" class="tab-content active">
-                    <div id="alerts"></div>
+                    <div id="dashboardAlerts"></div>
                     <div class="balance-cards">
                         <div class="balance-card">
                             <h3>PTO (Paid Time Off)</h3>
                             <div class="amount" id="ptoBalance">--</div>
-                            <div class="label">days remaining</div>
+                            <div class="label">days available</div>
+                            <div class="balance-detail" id="ptoDetail"></div>
                         </div>
                         <div class="balance-card sick-leave">
                             <h3>Sick Leave</h3>
                             <div class="amount" id="sickLeaveBalance">--</div>
-                            <div class="label">days remaining</div>
+                            <div class="label">days available</div>
+                            <div class="balance-detail" id="sickDetail"></div>
+                        </div>
+                        <div class="balance-card unpaid">
+                            <h3>Unpaid Leave</h3>
+                            <div class="amount" id="unpaidBalance">--</div>
+                            <div class="label">days used</div>
+                            <div class="balance-detail" id="unpaidDetail"></div>
                         </div>
                         <div class="balance-card holidays">
                             <h3>Upcoming Holidays</h3>
@@ -577,6 +741,11 @@
                 <div id="request" class="tab-content">
                     <h2 style="color: #00a8e8;">Request Leave</h2>
                     <form id="leaveRequestForm">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="isHalfDay">
+                            <label for="isHalfDay" style="margin-bottom: 0;">Half Day Leave</label>
+                        </div>
+                        
                         <div class="form-group">
                             <label>Leave Type <span class="required">*</span></label>
                             <select id="leaveType" required>
@@ -586,31 +755,35 @@
                                 <option value="unpaid">Unpaid Leave</option>
                             </select>
                         </div>
+                        
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Start Date <span class="required">*</span></label>
+                                <label><span id="startDateLabel">Start Date</span> <span class="required">*</span></label>
                                 <input type="date" id="startDate" required>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" id="endDateGroup">
                                 <label>End Date <span class="required">*</span></label>
                                 <input type="date" id="endDate" required>
                             </div>
                         </div>
-                        <div class="form-group checkbox-group">
-                            <input type="checkbox" id="isHalfDay">
-                            <label for="isHalfDay" style="margin-bottom: 0;">Half Day Leave</label>
-                        </div>
+                        
                         <div class="form-group">
                             <label>Reason</label>
                             <textarea id="reason" rows="4" placeholder="Please provide a reason for your leave request"></textarea>
                         </div>
+                        
                         <div class="form-group">
                             <label>Notify Colleagues (Optional)</label>
-                            <select id="notifyColleagues" multiple size="5" style="height: 120px;">
-                                <option value="">Loading employees...</option>
-                            </select>
-                            <small style="color: #666;">Hold Ctrl/Cmd to select multiple colleagues</small>
+                            <div class="colleague-selector">
+                                <select id="colleagueSelect">
+                                    <option value="">Select colleague to notify...</option>
+                                </select>
+                                <button type="button" class="btn btn-primary" onclick="addColleague()" style="padding: 8px 20px;">Add</button>
+                            </div>
+                            <div id="selectedColleaguesList" class="selected-colleagues"></div>
+                            <input type="hidden" id="notifyColleagues">
                         </div>
+                        
                         <div id="requestAlert"></div>
                         <button type="submit" class="btn btn-primary">Submit Request</button>
                     </form>
@@ -619,12 +792,14 @@
                 <!-- History Tab -->
                 <div id="history" class="tab-content">
                     <h2 style="color: #00a8e8;">My Leave Requests</h2>
+                    <div id="historyAlerts"></div>
                     <div id="requestHistory" class="request-list"></div>
                 </div>
 
                 <!-- Approve Tab -->
                 <div id="approve" class="tab-content">
-                    <h2 style="color: #00a8e8;">Pending Leave Requests</h2>
+                    <h2 style="color: #00a8e8;">Pending Requests</h2>
+                    <div id="approveAlerts"></div>
                     <div id="pendingRequests" class="request-list"></div>
                 </div>
 
@@ -653,6 +828,7 @@
 
                 <!-- Configuration Tab -->
                 <div id="config" class="tab-content">
+                    <div id="configAlerts"></div>
                     <div class="config-section">
                         <h2 style="color: #00a8e8;">Leave Allocation</h2>
                         <div class="form-group">
@@ -685,7 +861,131 @@
     </div>
 
     <script>
-        // ⚠️ IMPORTANT: Replace with your Google Apps Script Web App URL
+        // ========== TEAM VIEW (MANAGER) ==========
+        async function loadTeamView() {
+            try {
+                const employees = await apiGet('getAllEmployeesData');
+                
+                const html = employees.map(e => `
+                    <tr>
+                        <td><strong>${e.firstName} ${e.lastName}</strong><br><small style="color: #666;">${e.email}</small></td>
+                        <td>${e.role}</td>
+                        <td>${e.ptoUsed}/${e.ptoTotal}</td>
+                        <td><strong>${e.ptoRemaining}</strong></td>
+                        <td>${e.sickUsed}/${e.sickTotal}</td>
+                        <td><strong>${e.sickRemaining}</strong></td>
+                        <td>${e.unpaidUsed}</td>
+                    </tr>
+                `).join('');
+                
+                document.getElementById('teamData').innerHTML = html || '<tr><td colspan="7" style="text-align: center;">No employee data</td></tr>';
+            } catch (error) {
+                console.error('Error loading team view:', error);
+            }
+        }
+
+        // ========== CONFIGURATION ==========
+        async function loadConfig() {
+            try {
+                const config = await apiGet('getConfig');
+                document.getElementById('configPTO').value = config.PTOAllocation || 20;
+                document.getElementById('configSickLeave').value = config.SickLeaveAllocation || 10;
+            } catch (error) {
+                console.error('Error loading config:', error);
+            }
+        }
+
+        document.getElementById('saveConfigBtn').addEventListener('click', async function() {
+            try {
+                const result = await apiPost('updateConfig', {
+                    PTOAllocation: document.getElementById('configPTO').value,
+                    SickLeaveAllocation: document.getElementById('configSickLeave').value
+                });
+
+                if (result.success) {
+                    showAlert('success', '✅ Configuration saved successfully!', 'configAlerts');
+                }
+            } catch (error) {
+                showAlert('danger', `⚠️ Error: ${error.message}`, 'configAlerts');
+            }
+        });
+
+        // ========== HOLIDAYS ==========
+        async function loadHolidays() {
+            try {
+                const holidays = await apiGet('getHolidays');
+                
+                const html = holidays.map(h => `
+                    <div class="holiday-item">
+                        <span><strong>${h.name}</strong> - ${formatDateForUser(h.date)}</span>
+                        <button class="btn btn-reject" onclick="removeHoliday('${h.name}', '${h.date}')">Remove</button>
+                    </div>
+                `).join('');
+                
+                document.getElementById('holidayList').innerHTML = html || '<p>No holidays configured.</p>';
+            } catch (error) {
+                console.error('Error loading holidays:', error);
+            }
+        }
+
+        document.getElementById('addHolidayBtn').addEventListener('click', async function() {
+            const name = document.getElementById('holidayName').value.trim();
+            const date = document.getElementById('holidayDate').value;
+
+            if (!name || !date) {
+                showAlert('warning', 'Please enter holiday name and date', 'configAlerts');
+                return;
+            }
+
+            try {
+                const result = await apiPost('addHoliday', {name, date});
+                
+                if (result.success) {
+                    document.getElementById('holidayName').value = '';
+                    document.getElementById('holidayDate').value = '';
+                    await loadHolidays();
+                    await loadHolidaysForDatePicker();
+                    await loadDashboard();
+                    showAlert('success', '✅ Holiday added successfully!', 'configAlerts');
+                }
+            } catch (error) {
+                showAlert('danger', `⚠️ Error: ${error.message}`, 'configAlerts');
+            }
+        });
+
+        async function removeHoliday(name, date) {
+            if (!confirm(`Remove holiday: ${name}?`)) return;
+
+            try {
+                const result = await apiPost('removeHoliday', {name, date});
+                
+                if (result.success) {
+                    await loadHolidays();
+                    await loadHolidaysForDatePicker();
+                    await loadDashboard();
+                    showAlert('success', '✅ Holiday removed successfully!', 'configAlerts');
+                }
+            } catch (error) {
+                showAlert('danger', `⚠️ Error: ${error.message}`, 'configAlerts');
+            }
+        }
+
+        // ========== CHECK FOR SAVED SESSION ==========
+        window.addEventListener('load', () => {
+            const savedUser = localStorage.getItem('techgx_user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    showMainApp();
+                } catch (error) {
+                    console.error('Error loading saved session:', error);
+                    localStorage.removeItem('techgx_user');
+                }
+            }
+        });
+    </script>
+</body>
+</html> ⚠️ IMPORTANT: Replace with your Google Apps Script Web App URL
         const API_URL = 'https://script.google.com/macros/s/AKfycbyK2x4kDHTevh5rYsBSaDl2KXB3d4nX_zOP1XPOVMg9DWE931PdDsYosCmj0W8LWjbUSA/exec';
         const ALLOWED_DOMAINS = ['techg-x.com', 'techg-x.in'];
 
@@ -698,8 +998,101 @@
         };
 
         let allEmployees = [];
+        let selectedColleagues = [];
+        let companyHolidays = [];
 
-        // API Helper Functions
+        // ========== DATE FORMATTING FUNCTIONS ==========
+        function formatDateForDisplay(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString + 'T12:00:00Z');
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDateForUser(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString + 'T12:00:00Z');
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                timeZone: 'UTC'
+            });
+        }
+
+        // ========== WEEKEND & HOLIDAY FUNCTIONS ==========
+        function isWeekend(dateString) {
+            const date = new Date(dateString + 'T12:00:00Z');
+            const day = date.getUTCDay();
+            return day === 0 || day === 6;
+        }
+
+        function isHoliday(dateString) {
+            return companyHolidays.includes(dateString);
+        }
+
+        function isWeekendOrHoliday(dateString) {
+            return isWeekend(dateString) || isHoliday(dateString);
+        }
+
+        function getNextWorkingDay(dateString) {
+            let date = new Date(dateString + 'T12:00:00Z');
+            
+            while (true) {
+                const year = date.getUTCFullYear();
+                const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(date.getUTCDate()).padStart(2, '0');
+                const checkDate = `${year}-${month}-${day}`;
+                
+                if (!isWeekendOrHoliday(checkDate)) {
+                    return checkDate;
+                }
+                
+                date.setUTCDate(date.getUTCDate() + 1);
+            }
+        }
+
+        function calculateWorkingDays(startDateStr, endDateStr) {
+            const start = new Date(startDateStr + 'T12:00:00Z');
+            const end = new Date(endDateStr + 'T12:00:00Z');
+            let workingDays = 0;
+            
+            for (let d = new Date(start); d <= end; d.setUTCDate(d.getUTCDate() + 1)) {
+                const year = d.getUTCFullYear();
+                const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+                const day = String(d.getUTCDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+                
+                if (!isWeekendOrHoliday(dateStr)) {
+                    workingDays++;
+                }
+            }
+            
+            return workingDays;
+        }
+
+        // ========== ALERT SYSTEM ==========
+        function showAlert(type, message, containerId) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.innerHTML = message;
+            
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.insertBefore(alertDiv, container.firstChild);
+            } else {
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab) {
+                    activeTab.insertBefore(alertDiv, activeTab.firstChild);
+                }
+            }
+            
+            setTimeout(() => alertDiv.remove(), 5000);
+        }
+
+        // ========== API FUNCTIONS ==========
         async function apiGet(action, params = {}) {
             const url = new URL(API_URL);
             url.searchParams.append('action', action);
@@ -725,7 +1118,7 @@
             return {authorized: true};
         }
 
-        // Switch between login and registration
+        // ========== AUTH FUNCTIONS ==========
         document.getElementById('switchToRegBtn').addEventListener('click', function() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
@@ -742,7 +1135,6 @@
             document.getElementById('regAlert').innerHTML = '';
         });
 
-        // Register user
         document.getElementById('registerBtn').addEventListener('click', async function() {
             const firstName = document.getElementById('regFirstName').value.trim();
             const lastName = document.getElementById('regLastName').value.trim();
@@ -750,26 +1142,25 @@
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
             const role = document.getElementById('regRole').value;
-            const regAlert = document.getElementById('regAlert');
 
             if (!firstName || !lastName || !email || !password) {
-                regAlert.innerHTML = '<div class="alert alert-danger">All fields are required</div>';
+                showAlert('danger', 'All fields are required', 'regAlert');
                 return;
             }
 
             if (password !== confirmPassword) {
-                regAlert.innerHTML = '<div class="alert alert-danger">Passwords do not match</div>';
+                showAlert('danger', 'Passwords do not match', 'regAlert');
                 return;
             }
 
             if (password.length < 6) {
-                regAlert.innerHTML = '<div class="alert alert-danger">Password must be at least 6 characters</div>';
+                showAlert('danger', 'Password must be at least 6 characters', 'regAlert');
                 return;
             }
 
             const authCheck = isAuthorizedEmail(email);
             if (!authCheck.authorized) {
-                regAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${authCheck.message}</div>`;
+                showAlert('danger', authCheck.message, 'regAlert');
                 return;
             }
 
@@ -777,35 +1168,32 @@
                 const result = await apiPost('registerUser', {firstName, lastName, email, password, role});
                 
                 if (result.success) {
-                    regAlert.innerHTML = '<div class="alert alert-success">✅ Registration successful! Please login.</div>';
+                    showAlert('success', '✅ Registration successful! Please login.', 'regAlert');
                     setTimeout(() => {
                         document.getElementById('switchToLoginBtn').click();
                         document.getElementById('loginEmail').value = email;
                     }, 2000);
                 } else {
-                    regAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${result.error}</div>`;
+                    showAlert('danger', result.error, 'regAlert');
                 }
             } catch (error) {
-                regAlert.innerHTML = '<div class="alert alert-danger">⚠️ Error connecting to server. Please check your API_URL configuration.</div>';
-                console.error(error);
+                showAlert('danger', 'Error connecting to server. Check API_URL configuration.', 'regAlert');
             }
         });
 
-        // Login user
         document.getElementById('loginBtn').addEventListener('click', async function() {
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             const role = document.getElementById('loginRole').value;
-            const authAlert = document.getElementById('authAlert');
 
             if (!email || !password) {
-                authAlert.innerHTML = '<div class="alert alert-danger">Please enter email and password</div>';
+                showAlert('danger', 'Please enter email and password', 'authAlert');
                 return;
             }
 
             const authCheck = isAuthorizedEmail(email);
             if (!authCheck.authorized) {
-                authAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${authCheck.message}</div>`;
+                showAlert('danger', authCheck.message, 'authAlert');
                 return;
             }
 
@@ -828,15 +1216,13 @@
                     localStorage.setItem('techgx_user', JSON.stringify(currentUser));
                     showMainApp();
                 } else {
-                    authAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${result.error}</div>`;
+                    showAlert('danger', result.error, 'authAlert');
                 }
             } catch (error) {
-                authAlert.innerHTML = '<div class="alert alert-danger">⚠️ Error connecting to server. Please check your API_URL configuration.</div>';
-                console.error(error);
+                showAlert('danger', 'Error connecting to server', 'authAlert');
             }
         });
 
-        // Show main application
         async function showMainApp() {
             document.getElementById('authScreen').style.display = 'none';
             document.getElementById('mainApp').style.display = 'block';
@@ -844,6 +1230,7 @@
             document.getElementById('displayRole').textContent = currentUser.role === 'manager' ? 'Manager' : 'Employee';
             
             updateRoleTabs();
+            await loadHolidaysForDatePicker();
             await loadEmployees();
             await loadDashboard();
             await loadRequestHistory();
@@ -853,9 +1240,11 @@
                 await loadTeamView();
                 await loadConfig();
             }
+
+            setupHalfDayLogic();
+            setupDateValidation();
         }
 
-        // Logout
         document.getElementById('logoutBtn').addEventListener('click', function() {
             if (confirm('Are you sure you want to logout?')) {
                 localStorage.removeItem('techgx_user');
@@ -870,7 +1259,7 @@
             document.getElementById('configTab').style.display = isManager ? 'block' : 'none';
         }
 
-        // Tab switching
+        // ========== TAB SWITCHING ==========
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 const tabName = this.getAttribute('data-tab');
@@ -886,21 +1275,135 @@
             });
         });
 
-        // Load employees for dropdown
+        // ========== HALF DAY LOGIC ==========
+        function setupHalfDayLogic() {
+            const halfDayCheckbox = document.getElementById('isHalfDay');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const endDateGroup = document.getElementById('endDateGroup');
+            const startDateLabel = document.getElementById('startDateLabel');
+
+            if (halfDayCheckbox && startDateInput && endDateInput) {
+                halfDayCheckbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        endDateGroup.style.display = 'none';
+                        startDateLabel.textContent = 'Date';
+                        endDateInput.value = startDateInput.value;
+                    } else {
+                        endDateGroup.style.display = 'block';
+                        startDateLabel.textContent = 'Start Date';
+                    }
+                });
+
+                startDateInput.addEventListener('change', function() {
+                    if (halfDayCheckbox.checked) {
+                        endDateInput.value = this.value;
+                    }
+                });
+            }
+        }
+
+        // ========== DATE VALIDATION ==========
+        function setupDateValidation() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').min = today;
+            document.getElementById('endDate').min = today;
+
+            document.getElementById('startDate').addEventListener('change', function() {
+                const selectedDate = this.value;
+                
+                if (isWeekendOrHoliday(selectedDate)) {
+                    const nextWorking = getNextWorkingDay(selectedDate);
+                    showAlert('warning', `Selected date is a weekend or holiday. Moving to next working day: ${formatDateForUser(nextWorking)}`, 'requestAlert');
+                    this.value = nextWorking;
+                }
+                
+                if (document.getElementById('isHalfDay').checked) {
+                    document.getElementById('endDate').value = this.value;
+                }
+            });
+
+            document.getElementById('endDate').addEventListener('change', function() {
+                const selectedDate = this.value;
+                
+                if (isWeekendOrHoliday(selectedDate)) {
+                    const nextWorking = getNextWorkingDay(selectedDate);
+                    showAlert('warning', `Selected date is a weekend or holiday. Moving to next working day: ${formatDateForUser(nextWorking)}`, 'requestAlert');
+                    this.value = nextWorking;
+                }
+            });
+        }
+
+        // ========== COLLEAGUE SELECTOR ==========
+        function addColleague() {
+            const select = document.getElementById('colleagueSelect');
+            const email = select.value;
+            const name = select.options[select.selectedIndex].text;
+            
+            if (!email) {
+                showAlert('warning', 'Please select a colleague', 'requestAlert');
+                return;
+            }
+            
+            if (selectedColleagues.some(c => c.email === email)) {
+                showAlert('warning', 'This colleague is already added', 'requestAlert');
+                return;
+            }
+            
+            selectedColleagues.push({ email, name });
+            renderSelectedColleagues();
+            select.value = '';
+        }
+
+        function removeColleague(email) {
+            selectedColleagues = selectedColleagues.filter(c => c.email !== email);
+            renderSelectedColleagues();
+        }
+
+        function renderSelectedColleagues() {
+            const container = document.getElementById('selectedColleaguesList');
+            
+            if (selectedColleagues.length === 0) {
+                container.innerHTML = '';
+                document.getElementById('notifyColleagues').value = '';
+                return;
+            }
+            
+            const html = selectedColleagues.map(colleague => `
+                <div class="colleague-tag">
+                    <span>${colleague.name}</span>
+                    <button type="button" onclick="removeColleague('${colleague.email}')" title="Remove">×</button>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+            document.getElementById('notifyColleagues').value = selectedColleagues.map(c => c.email).join(',');
+        }
+
+        // ========== LOAD FUNCTIONS ==========
+        async function loadHolidaysForDatePicker() {
+            try {
+                const holidays = await apiGet('getHolidays');
+                companyHolidays = holidays.map(h => h.date);
+            } catch (error) {
+                console.error('Error loading holidays:', error);
+            }
+        }
+
         async function loadEmployees() {
             try {
                 allEmployees = await apiGet('getAllEmployees');
-                const select = document.getElementById('notifyColleagues');
-                select.innerHTML = allEmployees
-                    .filter(e => e.email !== currentUser.email)
-                    .map(e => `<option value="${e.email}">${e.fullName}</option>`)
-                    .join('');
+                const select = document.getElementById('colleagueSelect');
+                select.innerHTML = '<option value="">Select colleague to notify...</option>' +
+                    allEmployees
+                        .filter(e => e.email !== currentUser.email)
+                        .map(e => `<option value="${e.email}">${e.fullName}</option>`)
+                        .join('');
             } catch (error) {
                 console.error('Error loading employees:', error);
             }
         }
 
-        // Dashboard
         async function loadDashboard() {
             try {
                 const [balance, holidays] = await Promise.all([
@@ -909,13 +1412,35 @@
                 ]);
 
                 if (balance) {
-                    currentUser.balance.pto = balance.pto;
-                    currentUser.balance.sickLeave = balance.sickLeave;
+                    currentUser.balance = {
+                        pto: balance.pto,
+                        ptoApproved: balance.ptoApproved || 0,
+                        ptoPending: balance.ptoPending || 0,
+                        sickLeave: balance.sickLeave,
+                        sickApproved: balance.sickApproved || 0,
+                        sickPending: balance.sickPending || 0,
+                        unpaidLeave: balance.unpaidLeave || 0,
+                        unpaidApproved: balance.unpaidApproved || 0,
+                        unpaidPending: balance.unpaidPending || 0
+                    };
                     
                     document.getElementById('ptoBalance').textContent = balance.pto;
+                    document.getElementById('ptoDetail').innerHTML = `
+                        Approved: ${balance.ptoApproved || 0} | Pending: ${balance.ptoPending || 0}
+                    `;
+                    
                     document.getElementById('sickLeaveBalance').textContent = balance.sickLeave;
-
-                    const alerts = document.getElementById('alerts');
+                    document.getElementById('sickDetail').innerHTML = `
+                        Approved: ${balance.sickApproved || 0} | Pending: ${balance.sickPending || 0}
+                    `;
+                    
+                    const unpaidTotal = (balance.unpaidApproved || 0) + (balance.unpaidPending || 0);
+                    document.getElementById('unpaidBalance').textContent = unpaidTotal;
+                    document.getElementById('unpaidDetail').innerHTML = `
+                        Approved: ${balance.unpaidApproved || 0} | Pending: ${balance.unpaidPending || 0}
+                    `;
+                    
+                    const alerts = document.getElementById('dashboardAlerts');
                     let alertHTML = '';
                     if (balance.pto <= 3) {
                         alertHTML += `<div class="alert alert-warning">⚠️ Low PTO balance: ${balance.pto} days remaining</div>`;
@@ -931,7 +1456,7 @@
                     document.getElementById('upcomingHolidays').textContent = upcoming.length;
 
                     const preview = upcoming.slice(0, 3).map(h => 
-                        `<div class="holiday-item"><span><strong>${h.name}</strong></span><span>${new Date(h.date).toLocaleDateString()}</span></div>`
+                        `<div class="holiday-item"><span><strong>${h.name}</strong></span><span>${formatDateForUser(h.date)}</span></div>`
                     ).join('');
                     document.getElementById('holidayPreview').innerHTML = preview || '<p>No upcoming holidays</p>';
                 }
@@ -940,7 +1465,7 @@
             }
         }
 
-        // Submit leave request
+        // ========== LEAVE REQUEST SUBMISSION ==========
         document.getElementById('leaveRequestForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -949,18 +1474,56 @@
             const endDate = document.getElementById('endDate').value;
             const isHalfDay = document.getElementById('isHalfDay').checked;
             const reason = document.getElementById('reason').value;
-            
-            const notifySelect = document.getElementById('notifyColleagues');
-            const notifyEmails = Array.from(notifySelect.selectedOptions).map(opt => opt.value).join(',');
+            const notifyEmails = document.getElementById('notifyColleagues').value;
 
-            let days = calculateDays(startDate, endDate);
-            if (isHalfDay) days = 0.5;
+            // Half day validation
+            if (isHalfDay && startDate !== endDate) {
+                showAlert('danger', '⚠️ For half-day leave, please select only one date.', 'requestAlert');
+                return;
+            }
 
-            const requestAlert = document.getElementById('requestAlert');
+            // Calculate days
+            let days;
+            if (isHalfDay) {
+                days = 0.5;
+            } else {
+                days = calculateWorkingDays(startDate, endDate);
+            }
 
             if (days <= 0) {
-                requestAlert.innerHTML = '<div class="alert alert-danger">⚠️ Invalid date range</div>';
+                showAlert('danger', '⚠️ Invalid date range or no working days selected.', 'requestAlert');
                 return;
+            }
+
+            // Balance validation
+            if (type === 'pto') {
+                const totalPTOUsed = currentUser.balance.ptoApproved + currentUser.balance.ptoPending;
+                const ptoAllocation = 20;
+                const availablePTO = ptoAllocation - totalPTOUsed;
+                
+                if (days > availablePTO) {
+                    showAlert('danger', `
+                        ⚠️ Insufficient PTO balance!<br>
+                        <strong>Requested:</strong> ${days} days<br>
+                        <strong>Available:</strong> ${availablePTO} days (${currentUser.balance.ptoPending} pending)<br>
+                        <strong>Suggestion:</strong> Please apply for <strong>Unpaid Leave</strong> instead.
+                    `, 'requestAlert');
+                    return;
+                }
+            } else if (type === 'sick') {
+                const totalSickUsed = currentUser.balance.sickApproved + currentUser.balance.sickPending;
+                const sickAllocation = 10;
+                const availableSick = sickAllocation - totalSickUsed;
+                
+                if (days > availableSick) {
+                    showAlert('danger', `
+                        ⚠️ Insufficient Sick Leave balance!<br>
+                        <strong>Requested:</strong> ${days} days<br>
+                        <strong>Available:</strong> ${availableSick} days (${currentUser.balance.sickPending} pending)<br>
+                        <strong>Suggestion:</strong> Please apply for <strong>Unpaid Leave</strong> instead.
+                    `, 'requestAlert');
+                    return;
+                }
             }
 
             try {
@@ -978,52 +1541,58 @@
                 });
 
                 if (result.success) {
-                    requestAlert.innerHTML = '<div class="alert alert-success">✅ Leave request submitted successfully! Managers have been notified.</div>';
+                    showAlert('success', '✅ Leave request submitted successfully! Managers have been notified.', 'requestAlert');
                     document.getElementById('leaveRequestForm').reset();
+                    selectedColleagues = [];
+                    renderSelectedColleagues();
                     setTimeout(() => {
-                        requestAlert.innerHTML = '';
+                        document.getElementById('requestAlert').innerHTML = '';
                     }, 3000);
                     await loadRequestHistory();
                     await loadDashboard();
                 } else {
-                    requestAlert.innerHTML = `<div class="alert alert-danger">⚠️ ${result.error}</div>`;
+                    showAlert('danger', `⚠️ ${result.error}`, 'requestAlert');
                 }
             } catch (error) {
-                requestAlert.innerHTML = `<div class="alert alert-danger">⚠️ Error: ${error.message}</div>`;
+                showAlert('danger', `⚠️ Error: ${error.message}`, 'requestAlert');
             }
         });
 
-        function calculateDays(start, end) {
-            const startDate = new Date(start);
-            const endDate = new Date(end);
-            return Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-        }
-
-        // Request history
+        // ========== REQUEST HISTORY ==========
         async function loadRequestHistory() {
             try {
                 const requests = await apiGet('getRequests', {email: currentUser.email});
                 
                 const html = requests.map(r => {
-                    const canCancel = r.status === 'pending' || r.status === 'approved';
+                    const canCancel = (r.status === 'pending' || r.status === 'approved') && 
+                                      !r.cancellationRequested;
                     const isFuture = new Date(r.startDate) > new Date();
-                    const showCancel = canCancel && isFuture;
+                    const showCancelButton = canCancel && isFuture;
+                    
+                    let statusDisplay = `<span class="status-badge status-${r.status}">${r.status}</span>`;
+                    
+                    if (r.cancellationRequested) {
+                        const cancelStatus = r.cancellationStatus || 'pending';
+                        statusDisplay += ` <span class="status-badge status-warning">Cancellation: ${cancelStatus}</span>`;
+                    }
                     
                     return `
                     <div class="request-item ${r.status}">
                         <div class="request-header">
                             <h4>${r.type.toUpperCase()}${r.isHalfDay ? ' (Half Day)' : ''}</h4>
-                            <span class="status-badge status-${r.status}">${r.status}</span>
+                            <div>${statusDisplay}</div>
                         </div>
                         <div class="request-details">
-                            <strong>Duration:</strong> ${new Date(r.startDate).toLocaleDateString()} - ${new Date(r.endDate).toLocaleDateString()} (${r.days} days)<br>
+                            <strong>Duration:</strong> ${formatDateForUser(r.startDate)} - ${formatDateForUser(r.endDate)} (${r.days} days)<br>
                             <strong>Reason:</strong> ${r.reason || 'N/A'}<br>
-                            <strong>Submitted:</strong> ${new Date(r.submittedDate).toLocaleDateString()}
-                            ${r.processedDate ? `<br><strong>Processed:</strong> ${new Date(r.processedDate).toLocaleDateString()} by ${r.processedBy}` : ''}
+                            <strong>Submitted:</strong> ${formatDateForUser(r.submittedDate)}
+                            ${r.processedDate ? `<br><strong>Processed:</strong> ${formatDateForUser(r.processedDate)} by ${r.processedBy}` : ''}
+                            ${r.cancellationDate ? `<br><strong>Cancellation Requested:</strong> ${formatDateForUser(r.cancellationDate)}` : ''}
+                            ${r.cancellationProcessedBy ? `<br><strong>Cancellation Processed By:</strong> ${r.cancellationProcessedBy}` : ''}
                         </div>
-                        ${showCancel ? `
+                        ${showCancelButton ? `
                         <div class="request-actions">
-                            <button class="btn btn-cancel" onclick="cancelRequest(${r.id})">Cancel Request</button>
+                            <button class="btn btn-cancel" onclick="requestCancellation(${r.id})">Request Cancellation</button>
                         </div>
                         ` : ''}
                     </div>
@@ -1032,60 +1601,63 @@
                 document.getElementById('requestHistory').innerHTML = html || '<p>No requests yet.</p>';
             } catch (error) {
                 console.error('Error loading request history:', error);
-                document.getElementById('requestHistory').innerHTML = '<p class="alert alert-danger">Error loading requests</p>';
             }
         }
 
-        // Cancel request
-        async function cancelRequest(id) {
-            if (!confirm('Are you sure you want to cancel this leave request?')) return;
-
+        async function requestCancellation(id) {
+            if (!confirm('Submit cancellation request? This requires manager approval.')) return;
+            
             try {
-                const result = await apiPost('cancelRequest', {
+                const result = await apiPost('submitCancellationRequest', {
                     id: id,
-                    cancelledBy: `${currentUser.firstName} ${currentUser.lastName}`
+                    requestedBy: `${currentUser.firstName} ${currentUser.lastName}`
                 });
-
+                
                 if (result.success) {
-                    const msgDiv = document.createElement('div');
-                    msgDiv.className = 'alert alert-success';
-                    msgDiv.textContent = '✅ Leave request cancelled successfully! Managers have been notified.';
-                    document.getElementById('history').insertBefore(msgDiv, document.getElementById('requestHistory'));
-                    setTimeout(() => msgDiv.remove(), 3000);
-                    
+                    showAlert('success', '✅ Cancellation request submitted! Awaiting manager approval.', 'historyAlerts');
                     await loadRequestHistory();
-                    await loadDashboard();
                 } else {
-                    alert(`Error: ${result.error}`);
+                    showAlert('danger', `⚠️ ${result.error}`, 'historyAlerts');
                 }
             } catch (error) {
-                alert('Error cancelling request: ' + error.message);
+                showAlert('danger', `⚠️ Error: ${error.message}`, 'historyAlerts');
             }
         }
 
-        // Pending requests (Manager)
+        // ========== PENDING REQUESTS (MANAGER) ==========
         async function loadPendingRequests() {
             try {
                 const requests = await apiGet('getPendingRequests');
                 
-                const html = requests.map(r => `
-                    <div class="request-item pending" id="request-${r.id}">
-                        <div class="request-header">
-                            <h4>${r.firstName} ${r.lastName} - ${r.type.toUpperCase()}${r.isHalfDay ? ' (Half Day)' : ''}</h4>
-                            <span class="status-badge status-pending">pending</span>
+                const html = requests.map(r => {
+                    const isCancellationRequest = r.cancellationRequested && r.status === 'approved';
+                    const requestType = isCancellationRequest ? 'Cancellation Request' : 'Leave Request';
+                    
+                    return `
+                        <div class="request-item ${isCancellationRequest ? 'cancelled' : 'pending'}" id="request-${r.id}">
+                            <div class="request-header">
+                                <h4>${r.firstName} ${r.lastName} - ${r.type.toUpperCase()}${r.isHalfDay ? ' (Half Day)' : ''}</h4>
+                                <span class="status-badge status-${isCancellationRequest ? 'warning' : 'pending'}">${requestType}</span>
+                            </div>
+                            <div class="request-details">
+                                <strong>Email:</strong> ${r.email}<br>
+                                <strong>Duration:</strong> ${formatDateForUser(r.startDate)} - ${formatDateForUser(r.endDate)} (${r.days} days)<br>
+                                <strong>Reason:</strong> ${r.reason || 'N/A'}<br>
+                                <strong>Submitted:</strong> ${formatDateForUser(r.submittedDate)}
+                                ${isCancellationRequest ? '<br><strong>Note:</strong> Employee requested to cancel this approved leave' : ''}
+                            </div>
+                            <div class="request-actions">
+                                ${isCancellationRequest ? `
+                                    <button class="btn btn-approve" onclick="processCancellation(${r.id}, 'approved')" id="approve-cancel-${r.id}">✓ Approve Cancellation</button>
+                                    <button class="btn btn-reject" onclick="processCancellation(${r.id}, 'rejected')" id="reject-cancel-${r.id}">✗ Reject Cancellation</button>
+                                ` : `
+                                    <button class="btn btn-approve" onclick="updateRequestStatus(${r.id}, 'approved')" id="approve-${r.id}">✓ Approve</button>
+                                    <button class="btn btn-reject" onclick="updateRequestStatus(${r.id}, 'rejected')" id="reject-${r.id}">✗ Reject</button>
+                                `}
+                            </div>
                         </div>
-                        <div class="request-details">
-                            <strong>Email:</strong> ${r.email}<br>
-                            <strong>Duration:</strong> ${new Date(r.startDate).toLocaleDateString()} - ${new Date(r.endDate).toLocaleDateString()} (${r.days} days)<br>
-                            <strong>Reason:</strong> ${r.reason || 'N/A'}<br>
-                            <strong>Submitted:</strong> ${new Date(r.submittedDate).toLocaleDateString()}
-                        </div>
-                        <div class="request-actions">
-                            <button class="btn btn-approve" onclick="updateRequestStatus(${r.id}, 'approved')" id="approve-${r.id}">✓ Approve</button>
-                            <button class="btn btn-reject" onclick="updateRequestStatus(${r.id}, 'rejected')" id="reject-${r.id}">✗ Reject</button>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 
                 document.getElementById('pendingRequests').innerHTML = html || '<p>No pending requests.</p>';
             } catch (error) {
@@ -1093,7 +1665,6 @@
             }
         }
 
-        // Update request status
         async function updateRequestStatus(id, status) {
             const approveBtn = document.getElementById(`approve-${id}`);
             const rejectBtn = document.getElementById(`reject-${id}`);
@@ -1108,149 +1679,46 @@
                 });
 
                 if (result.success) {
-                    const msgDiv = document.createElement('div');
-                    msgDiv.className = 'alert alert-success';
-                    msgDiv.textContent = `✅ Request ${status} successfully! Employee has been notified.`;
-                    document.getElementById('approve').insertBefore(msgDiv, document.getElementById('pendingRequests'));
-                    setTimeout(() => msgDiv.remove(), 3000);
-                    
+                    showAlert('success', `✅ Request ${status} successfully! Employee has been notified.`, 'approveAlerts');
                     await loadPendingRequests();
+                } else {
+                    showAlert('danger', `⚠️ ${result.error}`, 'approveAlerts');
+                    if (approveBtn) approveBtn.disabled = false;
+                    if (rejectBtn) rejectBtn.disabled = false;
                 }
             } catch (error) {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'alert alert-danger';
-                msgDiv.textContent = `⚠️ Error: ${error.message}`;
-                document.getElementById('approve').insertBefore(msgDiv, document.getElementById('pendingRequests'));
-                setTimeout(() => msgDiv.remove(), 3000);
-                
+                showAlert('danger', `⚠️ Error: ${error.message}`, 'approveAlerts');
                 if (approveBtn) approveBtn.disabled = false;
                 if (rejectBtn) rejectBtn.disabled = false;
             }
         }
 
-        // Team view (Manager)
-        async function loadTeamView() {
+        async function processCancellation(id, cancellationStatus) {
+            const approveBtn = document.getElementById(`approve-cancel-${id}`);
+            const rejectBtn = document.getElementById(`reject-cancel-${id}`);
+            if (approveBtn) approveBtn.disabled = true;
+            if (rejectBtn) rejectBtn.disabled = true;
+            
             try {
-                const employees = await apiGet('getAllEmployeesData');
-                
-                const html = employees.map(e => `
-                    <tr>
-                        <td><strong>${e.firstName} ${e.lastName}</strong><br><small style="color: #666;">${e.email}</small></td>
-                        <td>${e.role}</td>
-                        <td>${e.ptoUsed}/${e.ptoTotal}</td>
-                        <td><strong>${e.ptoRemaining}</strong></td>
-                        <td>${e.sickUsed}/${e.sickTotal}</td>
-                        <td><strong>${e.sickRemaining}</strong></td>
-                        <td>${e.unpaidUsed}</td>
-                    </tr>
-                `).join('');
-                
-                document.getElementById('teamData').innerHTML = html || '<tr><td colspan="7" style="text-align: center;">No employee data</td></tr>';
-            } catch (error) {
-                console.error('Error loading team view:', error);
-                document.getElementById('teamData').innerHTML = '<tr><td colspan="7" style="text-align: center;" class="alert alert-danger">Error loading data</td></tr>';
-            }
-        }
-
-        // Configuration
-        async function loadConfig() {
-            try {
-                const config = await apiGet('getConfig');
-                document.getElementById('configPTO').value = config.PTOAllocation || 20;
-                document.getElementById('configSickLeave').value = config.SickLeaveAllocation || 10;
-            } catch (error) {
-                console.error('Error loading config:', error);
-            }
-        }
-
-        document.getElementById('saveConfigBtn').addEventListener('click', async function() {
-            try {
-                const result = await apiPost('updateConfig', {
-                    PTOAllocation: document.getElementById('configPTO').value,
-                    SickLeaveAllocation: document.getElementById('configSickLeave').value
+                const result = await apiPost('processCancellation', {
+                    id: id,
+                    cancellationStatus: cancellationStatus,
+                    processedBy: `${currentUser.firstName} ${currentUser.lastName}`
                 });
-
+                
                 if (result.success) {
-                    const msgDiv = document.createElement('div');
-                    msgDiv.className = 'alert alert-success';
-                    msgDiv.textContent = '✅ Configuration saved successfully!';
-                    document.querySelector('#config .config-section').insertBefore(msgDiv, document.querySelector('#config .config-section').firstChild);
-                    setTimeout(() => msgDiv.remove(), 3000);
+                    showAlert('success', `✅ Cancellation ${cancellationStatus}! Employee has been notified.`, 'approveAlerts');
+                    await loadPendingRequests();
+                } else {
+                    showAlert('danger', `⚠️ ${result.error}`, 'approveAlerts');
+                    if (approveBtn) approveBtn.disabled = false;
+                    if (rejectBtn) rejectBtn.disabled = false;
                 }
             } catch (error) {
-                alert('Error saving configuration: ' + error.message);
-            }
-        });
-
-        // Holidays
-        async function loadHolidays() {
-            try {
-                const holidays = await apiGet('getHolidays');
-                
-                const html = holidays.map(h => `
-                    <div class="holiday-item">
-                        <span><strong>${h.name}</strong> - ${new Date(h.date).toLocaleDateString()}</span>
-                        <button class="btn btn-reject" onclick="removeHoliday('${h.name}', '${h.date}')">Remove</button>
-                    </div>
-                `).join('');
-                
-                document.getElementById('holidayList').innerHTML = html || '<p>No holidays configured.</p>';
-            } catch (error) {
-                console.error('Error loading holidays:', error);
+                showAlert('danger', `⚠️ Error: ${error.message}`, 'approveAlerts');
+                if (approveBtn) approveBtn.disabled = false;
+                if (rejectBtn) rejectBtn.disabled = false;
             }
         }
 
-        document.getElementById('addHolidayBtn').addEventListener('click', async function() {
-            const name = document.getElementById('holidayName').value.trim();
-            const date = document.getElementById('holidayDate').value;
-
-            if (!name || !date) {
-                alert('Please enter holiday name and date');
-                return;
-            }
-
-            try {
-                const result = await apiPost('addHoliday', {name, date});
-                
-                if (result.success) {
-                    document.getElementById('holidayName').value = '';
-                    document.getElementById('holidayDate').value = '';
-                    await loadHolidays();
-                    await loadDashboard();
-                }
-            } catch (error) {
-                alert('Error adding holiday: ' + error.message);
-            }
-        });
-
-        async function removeHoliday(name, date) {
-            if (!confirm(`Remove holiday: ${name}?`)) return;
-
-            try {
-                const result = await apiPost('removeHoliday', {name, date});
-                
-                if (result.success) {
-                    await loadHolidays();
-                    await loadDashboard();
-                }
-            } catch (error) {
-                alert('Error removing holiday: ' + error.message);
-            }
-        }
-
-        // Check for saved session on page load
-        window.addEventListener('load', () => {
-            const savedUser = localStorage.getItem('techgx_user');
-            if (savedUser) {
-                try {
-                    currentUser = JSON.parse(savedUser);
-                    showMainApp();
-                } catch (error) {
-                    console.error('Error loading saved session:', error);
-                    localStorage.removeItem('techgx_user');
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+        //
