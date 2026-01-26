@@ -1303,12 +1303,25 @@
 
         // ========== DATE VALIDATION ==========
         function setupDateValidation() {
+            // Allow dates from Jan 1st of current year
+            const currentYear = new Date().getFullYear();
+            const jan1 = `${currentYear}-01-01`;
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('startDate').min = today;
-            document.getElementById('endDate').min = today;
+            
+            document.getElementById('startDate').min = jan1;
+            document.getElementById('endDate').min = jan1;
 
             document.getElementById('startDate').addEventListener('change', function() {
-                const selectedDate = this.value;
+            const selectedDate = this.value;
+            
+                // Set end date minimum to start date
+                document.getElementById('endDate').min = selectedDate;
+                
+                // If end date is before start date, reset it
+                const endDateValue = document.getElementById('endDate').value;
+                if (endDateValue && endDateValue < selectedDate) {
+                    document.getElementById('endDate').value = selectedDate;
+                }
                 
                 if (isWeekendOrHoliday(selectedDate)) {
                     const nextWorking = getNextWorkingDay(selectedDate);
@@ -1450,10 +1463,13 @@
                 }
 
                 if (holidays) {
-                    const upcoming = holidays.filter(h => new Date(h.date) > new Date());
+                   // Sort holidays by date
+                    const sortedHolidays = holidays.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    const upcoming = sortedHolidays.filter(h => new Date(h.date) > new Date());
                     document.getElementById('upcomingHolidays').textContent = upcoming.length;
-
-                    const preview = upcoming.slice(0, 3).map(h => 
+                    
+                    // Show ALL upcoming holidays, not just first 3
+                    const preview = upcoming.map(h => 
                         `<div class="holiday-item"><span><strong>${h.name}</strong></span><span>${formatDateForUser(h.date)}</span></div>`
                     ).join('');
                     document.getElementById('holidayPreview').innerHTML = preview || '<p>No upcoming holidays</p>';
