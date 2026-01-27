@@ -1415,7 +1415,7 @@
         async function loadHolidaysForDatePicker() {
             try {
                 const holidays = await apiGet('getHolidays');
-                // Sort by date
+                // Sort by date           
                 const sortedHolidays = holidays.sort((a, b) => new Date(a.date) - new Date(b.date));
                 companyHolidays = sortedHolidays.map(h => h.date);
             } catch (error) {
