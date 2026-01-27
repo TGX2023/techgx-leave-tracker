@@ -1536,9 +1536,8 @@
 
             // Balance validation
             if (type === 'pto') {
-                const totalPTOUsed = currentUser.balance.ptoApproved + currentUser.balance.ptoPending;
-                const ptoAllocation = 20;
-                const availablePTO = ptoAllocation - totalPTOUsed;
+                // Use the available balance that comes from API (already calculated with config)
+                const availablePTO = currentUser.balance.pto;
                 
                 if (days > availablePTO) {
                     showAlert('danger', `
@@ -1550,9 +1549,8 @@
                     return;
                 }
             } else if (type === 'sick') {
-                const totalSickUsed = currentUser.balance.sickApproved + currentUser.balance.sickPending;
-                const sickAllocation = 10;
-                const availableSick = sickAllocation - totalSickUsed;
+                // Use the available balance that comes from API (already calculated with config)
+                const availableSick = currentUser.balance.sickLeave;
                 
                 if (days > availableSick) {
                     showAlert('danger', `
