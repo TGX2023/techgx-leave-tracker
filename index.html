@@ -967,6 +967,9 @@
         });
 
             async function removeHoliday(name, date) {
+            // Disable button
+            this.disabled = true;
+            this.textContent = 'Removing...';
             showAlert('warning', `⚠️ Removing holiday: ${name}...`, 'configAlerts');
 
             try {
@@ -977,9 +980,13 @@
                     await loadHolidaysForDatePicker();
                     await loadDashboard();
                     showAlert('success', '✅ Holiday removed successfully!', 'configAlerts');
+                    this.disabled = false;
+                    this.textContent = 'Remove';
                 }
             } catch (error) {
                 showAlert('danger', `⚠️ Error: ${error.message}`, 'configAlerts');
+                this.disabled = false;
+                this.textContent = 'Remove';
             }
         }
 
