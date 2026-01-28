@@ -1374,9 +1374,8 @@
             document.getElementById('holidayDate').max = dec31;
             
             document.getElementById('startDate').addEventListener('change', function() {
-            const selectedDate = this.value;
-            
-                // Set end date minimum to start date
+                const selectedDate = this.value;
+                 // Set end date minimum to start date
                 document.getElementById('endDate').min = selectedDate;
                 
                 // If end date is before start date, reset it
