@@ -952,8 +952,8 @@
                 if (result.success) {
                     document.getElementById('holidayName').value = '';
                     document.getElementById('holidayDate').value = '';
-                    await ();
-                    await ForDatePicker();
+                    await loadHolidays();
+                    await loadHolidaysForDatePicker();
                     await loadDashboard();
                     showAlert('success', '✅ Holiday added successfully!', 'configAlerts');
                     this.disabled = false;
