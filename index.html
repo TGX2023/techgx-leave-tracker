@@ -916,14 +916,14 @@
         });
 
         // ========== HOLIDAYS ==========
-        async function loadHolidays() {
+        async function () {
             try {
                 const holidays = await apiGet('getHolidays');
                 
                 const html = holidays.map(h => `
                     <div class="holiday-item">
                         <span><strong>${h.name}</strong> - ${formatDateForUser(h.date)}</span>
-                        <button class="btn btn-reject" onclick="removeHoliday('${h.name}', '${h.date}')">Remove</button>
+                        <button class="btn btn-reject" id="removeHolidayBtn-${index}" onclick="removeHoliday('${h.name}', '${h.date}', ${index})">Remove</button>
                     </div>
                 `).join('');
                 
@@ -952,8 +952,8 @@
                 if (result.success) {
                     document.getElementById('holidayName').value = '';
                     document.getElementById('holidayDate').value = '';
-                    await loadHolidays();
-                    await loadHolidaysForDatePicker();
+                    await ();
+                    await ForDatePicker();
                     await loadDashboard();
                     showAlert('success', '✅ Holiday added successfully!', 'configAlerts');
                     this.disabled = false;
@@ -966,29 +966,39 @@
             }
         });
 
-            async function removeHoliday(name, date) {
-            // Disable button
-            this.disabled = true;
-            this.textContent = 'Removing...';
-            showAlert('warning', `⚠️ Removing holiday: ${name}...`, 'configAlerts');
-
+            async function removeHoliday(name, date, index) {
+            // Find and disable the specific button
+            const btn = document.getElementById(`removeHolidayBtn-${index}`);
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Removing...';
+            }
+            showAlert('info', `Removing holiday: ${name}...`, 'configAlerts');
             try {
                 const result = await apiPost('removeHoliday', {name, date});
-                
                 if (result.success) {
                     await loadHolidays();
                     await loadHolidaysForDatePicker();
                     await loadDashboard();
                     showAlert('success', '✅ Holiday removed successfully!', 'configAlerts');
-                    this.disabled = false;
-                    this.textContent = 'Remove';
+                 } else {
+                    showAlert('danger', `⚠️ ${result.error}`, 'configAlerts');
+                    // Re-enable button on error
+                    if (btn) {
+                        btn.disabled = false;
+                    btn.textContent = 'Remove';
                 }
+            }    
             } catch (error) {
                 showAlert('danger', `⚠️ Error: ${error.message}`, 'configAlerts');
-                this.disabled = false;
-                this.textContent = 'Remove';
+                // Re-enable button on error
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Remove';
+                }    
             }
         }
+
 
         // ========== CHECK FOR SAVED SESSION ==========
         window.addEventListener('load', () => {
