@@ -920,7 +920,7 @@
             try {
                 const holidays = await apiGet('getHolidays');
                 
-                const html = holidays.map(h => `
+                const html = holidays.map((h, index) =>  `
                     <div class="holiday-item">
                         <span><strong>${h.name}</strong> - ${formatDateForUser(h.date)}</span>
                         <button class="btn btn-reject" id="removeHolidayBtn-${index}" onclick="removeHoliday('${h.name}', '${h.date}', ${index})">Remove</button>
